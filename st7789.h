@@ -22,6 +22,13 @@
 #define ST7789_MADCTL  0x36
 #define ST7789_COLMOD  0x3A
 
+// Joystick pins (BCM numbering)
+#define JOYSTICK_UP     17
+#define JOYSTICK_DOWN   22
+#define JOYSTICK_LEFT   27
+#define JOYSTICK_RIGHT  23
+
+
 void writeCommand(uint8_t cmd);
 
 void writeData(uint8_t data);
@@ -31,3 +38,14 @@ void st7789_init();
 void st7789_fillScreen(uint16_t color);
 
 void st7789_drawDot(int x, int y, uint16_t color);
+
+void st7789_joystick_init();
+
+typedef struct {
+    uint8_t up;
+    uint8_t down;
+    uint8_t left;
+    uint8_t right;
+} JoystickState;
+
+JoystickState st7789_readJoystick();

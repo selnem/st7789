@@ -13,6 +13,7 @@ void writeData(uint8_t data) {
     bcm2835_spi_transfer(data);
 }
 
+
 void st7789_init() {
     bcm2835_spi_begin();
     bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_8);
@@ -85,3 +86,24 @@ void st7789_drawDot(int x, int y, uint16_t color) {
         bcm2835_spi_transfer(lo);
     }
 }
+
+void st7789_joystick_init() {
+    bcm2835_gpio_fsel(JOYSTICK_UP, BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_set_pud(JOYSTICK_UP, BCM2835_GPIO_PUD_UP);
+    bcm2835_gpio_fsel(JOYSTICK_DOWN, BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_set_pud(JOYSTICK_DOWN, BCM2835_GPIO_PUD_UP);
+    bcm2835_gpio_fsel(JOYSTICK_LEFT, BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_set_pud(JOYSTICK_LEFT, BCM2835_GPIO_PUD_UP);
+    bcm2835_gpio_fsel(JOYSTICK_RIGHT, BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_set_pud(JOYSTICK_RIGHT, BCM2835_GPIO_PUD_UP);
+}
+
+JoystickState st7789_readJoystick() {
+    JoystickState s;
+    s.up = (bcm2835_gpio_lev(JOYSTICK_UP) == 0) ? 1 : 0;
+    s.down = (bcm2835_gpio_lev(JOYSTICK_DOWN) == 0) ? 1 : 0;
+    s.left = (bcm2835_gpio_lev(JOYSTICK_LEFT) == 0) ? 1 : 0;
+    s.right = (bcm2835_gpio_lev(JOYSTICK_RIGHT) == 0) ? 1 : 0;
+    return s;
+}
+

@@ -2,6 +2,9 @@
 #include <bcm2835.h>
 #include "st7789.h"
 
+void moveDot(int *x, int *y);
+int inRange(int x, int y);
+
 int main(int argc, char **argv) {
     if (!bcm2835_init()) {
         printf("bcm2835_init failed. Are you running as root?\n");
@@ -24,10 +27,43 @@ int main(int argc, char **argv) {
     st7789_fillScreen(0x001F); // Blue
     delay(1000);
     st7789_fillScreen(0xFFFF);
-    st7789_drawDot(x,y,0x0000);
-    delay(7000);
-
+    while(1){
+        st7789_drawDot(x, y, 0x0000);
+        moveDot(&x, &y);
+        st7789_drawDot(x,y,0xFFFF);
+    }
+    
     bcm2835_spi_end();
     bcm2835_close();
     return 0;
+}
+void moveDot(int *x, int *y) {
+    JoystickState s = st7789_readJoystick();
+    if (s.up) {
+        if (inRange(*x, *y - 1)) {
+            *y -= 1;
+        }
+    }
+    if (s.down) {
+        if (inRange(*x, *y + 1)) {
+            *y += 1;
+        }
+    }
+    if (s.left) {
+        if (inRange(*x - 1, *y)) {
+            *x -= 1;
+        }
+    }
+    if (s.right) {
+        if (inRange(*x + 1, *y)) {
+            *x += 1;
+        }
+    }
+}
+int inRange(int x, int y) {
+    // keep 1-pixel margin for 3x3 dot
+    if (x < 1 || x > 238 || y < 1 || y > 238) {
+        return 0;
+    }
+    return 1;
 }
