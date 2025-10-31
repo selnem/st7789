@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
     
     st7789_init();
-    
+    int x=120,y=120; 
     // Fill screen with different colors
     st7789_fillScreen(0xF800); // Red
     delay(1000);
