@@ -72,18 +72,68 @@ void st7789_fillScreen(uint16_t color) {
 }
 
 void st7789_drawDot(int x, int y, uint16_t color) {
+    // Clamp drawing window to valid bounds (3x3 dot centered at x,y)
+    int x0 = x - 1;
+    int x1 = x + 1;
+    int y0 = y - 1;
+    int y1 = y + 1;
+    if (x0 < 0) x0 = 0;
+    if (y0 < 0) y0 = 0;
+    if (x1 >= ST7789_TFTWIDTH) x1 = ST7789_TFTWIDTH - 1;
+    if (y1 >= ST7789_TFTHEIGHT) y1 = ST7789_TFTHEIGHT - 1;
+
     uint8_t hi = color >> 8, lo = color & 0xFF;
+
+    // Set column address
     writeCommand(ST7789_CASET);
-    writeData((x-1) >> 8); writeData((x-1) & 0xFF);
-    writeData((x+1) >> 8); writeData((x+1) & 0xFF);
+    writeData((x0 >> 8) & 0xFF); writeData(x0 & 0xFF);
+    writeData((x1 >> 8) & 0xFF); writeData(x1 & 0xFF);
+
+    // Set row address
     writeCommand(ST7789_RASET);
-    writeData((y-1) >> 8); writeData((y-1) & 0xFF);
-    writeData((y+1) >> 8); writeData((y+1) & 0xFF);
+    writeData((y0 >> 8) & 0xFF); writeData(y0 & 0xFF);
+    writeData((y1 >> 8) & 0xFF); writeData(y1 & 0xFF);
+
+    // Write pixel data (3x3 = up to 9 pixels)
     writeCommand(ST7789_RAMWR);
     bcm2835_gpio_set(TFT_DC);
-    for(int i = 0; i < 9; i++) {
+    int width = (x1 - x0 + 1);
+    int height = (y1 - y0 + 1);
+    int count = width * height;
+    for (int i = 0; i < count; i++) {
         bcm2835_spi_transfer(hi);
         bcm2835_spi_transfer(lo);
+    }
+}
+
+void st7789_drawFrame(int x, int y, uint16_t dotColor, uint16_t bgColor) {
+    // Set full-screen address window
+    writeCommand(ST7789_RASET);
+    writeData(0); writeData(0);
+    writeData((ST7789_TFTHEIGHT >> 8) & 0xFF); writeData(ST7789_TFTHEIGHT & 0xFF);
+
+    writeCommand(ST7789_CASET);
+    writeData(0); writeData(0);
+    writeData((ST7789_TFTWIDTH >> 8) & 0xFF); writeData(ST7789_TFTWIDTH & 0xFF);
+
+    writeCommand(ST7789_RAMWR);
+    bcm2835_gpio_set(TFT_DC);
+
+    uint8_t dotHi = dotColor >> 8, dotLo = dotColor & 0xFF;
+    uint8_t bgHi = bgColor >> 8, bgLo = bgColor & 0xFF;
+
+    for (int iy = 0; iy < ST7789_TFTHEIGHT; iy++) {
+        for (int ix = 0; ix < ST7789_TFTWIDTH; ix++) {
+            int dx = ix - x;
+            int dy = iy - y;
+            if (dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1) {
+                bcm2835_spi_transfer(dotHi);
+                bcm2835_spi_transfer(dotLo);
+            } else {
+                bcm2835_spi_transfer(bgHi);
+                bcm2835_spi_transfer(bgLo);
+            }
+        }
     }
 }
 

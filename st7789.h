@@ -39,6 +39,9 @@ void st7789_fillScreen(uint16_t color);
 
 void st7789_drawDot(int x, int y, uint16_t color);
 
+// Render full frame each time based on dot position
+void st7789_drawFrame(int x, int y, uint16_t dotColor, uint16_t bgColor);
+
 void st7789_joystick_init();
 
 typedef struct {

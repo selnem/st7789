@@ -19,6 +19,9 @@ int main(int argc, char **argv) {
     
     st7789_init();
     int x=120,y=120; 
+    int prevX = x, prevY = y;
+    uint64_t lastStepUs = bcm2835_st_read();
+    const uint64_t stepIntervalUs = 16000; // ~60 updates/sec
     // Fill screen with different colors
     st7789_fillScreen(0xF800); // Red
     delay(1000);
@@ -28,9 +31,15 @@ int main(int argc, char **argv) {
     delay(1000);
     st7789_fillScreen(0xFFFF);
     while(1){
-        st7789_drawDot(x, y, 0x0000);
-        moveDot(&x, &y);
-        st7789_drawDot(x,y,0xFFFF);
+        // Read input immediately (no blocking)
+        uint64_t nowUs = bcm2835_st_read();
+
+        if (nowUs - lastStepUs >= stepIntervalUs) {
+            // Fixed-step update and full redraw every tick
+            moveDot(&x, &y);
+            st7789_drawFrame(x, y, 0x0000, 0xFFFF);
+            lastStepUs = nowUs;
+        }
     }
     
     bcm2835_spi_end();
