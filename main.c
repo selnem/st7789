@@ -31,15 +31,10 @@ int main(int argc, char **argv) {
     delay(1000);
     st7789_fillScreen(0xFFFF);
     while(1){
-        // Read input immediately (no blocking)
-        uint64_t nowUs = bcm2835_st_read();
 
-        if (nowUs - lastStepUs >= stepIntervalUs) {
-            // Fixed-step update and full redraw every tick
-            moveDot(&x, &y);
-            st7789_drawFrame(x, y, 0x0000, 0xFFFF);
-            lastStepUs = nowUs;
-        }
+        moveDot(&x, &y);
+        st7789_drawFrame(x, y, 0x0000, 0xFFFF);
+    
     }
     
     bcm2835_spi_end();
