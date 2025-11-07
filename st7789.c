@@ -36,7 +36,7 @@ void st7789_init() {
 
     writeCommand(ST7789_MADCTL);
     writeData(0x00);              // Normal display
-
+    writeCommand(0x21);
     writeCommand(ST7789_CASET);
     writeData(0x00); writeData(0x00); // XSTART = 0
     writeData(ST7789_TFTWIDTH >> 8); writeData(ST7789_TFTWIDTH & 0xFF); // XEND
