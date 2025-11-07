@@ -4,8 +4,8 @@ CC=gcc
 
 all: main
 
-main: main.c st7789.c
-	$(CC) $(CFLAGS) -o main main.c st7789.c $(LDFLAGS)
+main: main.c st7789.c images.c
+	$(CC) $(CFLAGS) -o main main.c st7789.c images.c $(LDFLAGS)
 
 clean:
 	rm -f main

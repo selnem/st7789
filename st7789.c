@@ -1,7 +1,7 @@
 #include <bcm2835.h>
 #include <stdio.h>
-
 #include "st7789.h"
+
 
 void writeCommand(uint8_t cmd) {
     bcm2835_gpio_clr(TFT_DC);

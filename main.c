@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <bcm2835.h>
 #include "st7789.h"
+#include "images.h"
+#include "screen.h"
 
 void moveDot(int *x, int *y);
 int inRange(int x, int y);
@@ -30,12 +32,8 @@ int main(int argc, char **argv) {
     st7789_fillScreen(0x001F); // Blue
     delay(1000);
     st7789_fillScreen(0xFFFF);
-    while(1){
 
-        moveDot(&x, &y);
-        st7789_drawFrame(x, y, 0x0000, 0xFFFF);
-    
-    }
+    test_screen();
     
     bcm2835_spi_end();
     bcm2835_close();
