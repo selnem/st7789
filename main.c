@@ -5,7 +5,7 @@
 #include "screen.h"
 
 void moveDot(int *x, int *y);
-int inRange(int x, int y);
+static int inRange(int x, int y);
 
 int main(int argc, char **argv) {
     if (!bcm2835_init()) {
@@ -62,7 +62,7 @@ void moveDot(int *x, int *y) {
         }
     }
 }
-int inRange(int x, int y) {
+static int inRange(int x, int y) {
     // keep 1-pixel margin for 3x3 dot
     if (x < 1 || x > 238 || y < 1 || y > 238) {
         return 0;

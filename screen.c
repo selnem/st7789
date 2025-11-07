@@ -8,7 +8,7 @@ const bitmap screen_bitmap={ST7789_TFTHEIGHT,ST7789_TFTWIDTH, (uint16_t*)screen_
 
 
 
-int inRange(int x,int y,const bitmap* obj);
+static int inRange(int x,int y,const bitmap* obj);
 void reset_screen(){
     for(int i=0;i<screen_bitmap.height;i++){
         for(int j=0;j<screen_bitmap.width;j++){
@@ -62,6 +62,6 @@ void test_screen(){
 
 }
 
-int inRange(int x,int y,const bitmap* obj){
+static int inRange(int x,int y,const bitmap* obj){
   return 0<=x && x+obj->width<screen_bitmap.width &&0<=y && y+obj->height<screen_bitmap.height;
 }
