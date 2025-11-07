@@ -53,8 +53,8 @@ void test_screen(){
   writeCommand(ST7789_RAMWR);
   bcm2835_gpio_set(TFT_DC);
 
-  for(int i=0;i<ST7789_TFTWIDTH*ST7789_TFTWIDTH;i++){
-    for(int j=0;j<ST7789_TFTHEIGHT;j++){
+  for(int i=0;i<ST7789_TFTHEIGHT;i++){
+    for(int j=0;j<ST7789_TFTWIDTH;j++){
       bcm2835_spi_transfer(pixelHi(screen_pixels[i*ST7789_TFTWIDTH+j]));
       bcm2835_spi_transfer(pixelLo(screen_pixels[i*ST7789_TFTWIDTH+j]));
     }
