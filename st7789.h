@@ -43,7 +43,7 @@ void st7789_drawDot(int x, int y, uint16_t color);
 void st7789_drawFrame(int x, int y, uint16_t dotColor, uint16_t bgColor);
 
 void st7789_joystick_init();
-
+void st7789_writeCmds();
 typedef struct {
     uint8_t up;
     uint8_t down;

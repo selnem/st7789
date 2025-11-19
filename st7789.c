@@ -157,3 +157,15 @@ JoystickState st7789_readJoystick() {
     return s;
 }
 
+void st7789_writeCmds() {
+    writeCommand(ST7789_RASET);
+    writeData(0); writeData(0);
+    writeData((ST7789_TFTHEIGHT >> 8) & 0xFF); writeData(ST7789_TFTHEIGHT & 0xFF);
+
+    writeCommand(ST7789_CASET);
+    writeData(0); writeData(0);
+    writeData((ST7789_TFTWIDTH >> 8) & 0xFF); writeData(ST7789_TFTWIDTH & 0xFF);
+
+    writeCommand(ST7789_RAMWR);
+    bcm2835_gpio_set(TFT_DC);
+}
