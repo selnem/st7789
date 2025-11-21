@@ -116,8 +116,10 @@ int main(void) {
 
     // 4. Receive data continuously
     char rx_buffer[RX_BUFFER_SIZE];
+    // Clear the buffer
+    memset(rx_buffer, 0, RX_BUFFER_SIZE); 
     while(1) {
-        memset(rx_buffer, 0, RX_BUFFER_SIZE); // Clear the buffer
+        
     
         // Read up to RX_BUFFER_SIZE - 1 bytes
         int n_read = read(fd, rx_buffer, RX_BUFFER_SIZE - 1); 
