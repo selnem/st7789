@@ -135,7 +135,7 @@ int main(void) {
             // Null-terminate the string
             rx_buffer[n_read] = '\0';
             
-            prinnt("%s"rx_buffer);
+            prinnt("%s",rx_buffer);
             if(rx_buffer[n_read-1]=='\n'){
                 break;
             }
