@@ -4,8 +4,8 @@ CC=gcc
 
 all: main
 
-main: sirial.c
-	$(CC) $(CFLAGS) -o main sirial.c $(LDFLAGS)
+main: main.c
+	$(CC) $(CFLAGS) -o main main.c $(LDFLAGS)
 
 clean:
 	rm -f main
