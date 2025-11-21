@@ -4,8 +4,6 @@
 #include "images.h"
 #include "screen.h"
 
-void moveDot(int *x, int *y);
-static int inRange(int x, int y);
 
 int main(int argc, char **argv) {
     if (!bcm2835_init()) {
@@ -20,52 +18,11 @@ int main(int argc, char **argv) {
 
     
     st7789_init();
-    int x=120,y=120; 
-    int prevX = x, prevY = y;
-    uint64_t lastStepUs = bcm2835_st_read();
-    const uint64_t stepIntervalUs = 16000; // ~60 updates/sec
-    // Fill screen with different colors
-    st7789_fillScreen(0xF800); // Red
-    delay(1000);
-    st7789_fillScreen(0x07E0); // Green
-    delay(1000);
-    st7789_fillScreen(0x001F); // Blue
-    delay(1000);
-    st7789_fillScreen(0xFFFF);
+    while (1) {
 
-    test_screen();
+    }
     
     bcm2835_spi_end();
     bcm2835_close();
     return 0;
-}
-void moveDot(int *x, int *y) {
-    JoystickState s = st7789_readJoystick();
-    if (s.up) {
-        if (inRange(*x, *y - 1)) {
-            *y -= 1;
-        }
-    }
-    if (s.down) {
-        if (inRange(*x, *y + 1)) {
-            *y += 1;
-        }
-    }
-    if (s.left) {
-        if (inRange(*x - 1, *y)) {
-            *x -= 1;
-        }
-    }
-    if (s.right) {
-        if (inRange(*x + 1, *y)) {
-            *x += 1;
-        }
-    }
-}
-static int inRange(int x, int y) {
-    // keep 1-pixel margin for 3x3 dot
-    if (x < 1 || x > 238 || y < 1 || y > 238) {
-        return 0;
-    }
-    return 1;
 }

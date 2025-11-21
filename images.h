@@ -9,3 +9,4 @@ typedef struct bitmap {
 } bitmap;
 
 extern const bitmap clr_circle_bitmap;
+extern const bitmap screen_bitmap;

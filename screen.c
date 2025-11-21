@@ -3,12 +3,21 @@
 #include "images.h"
 #include "st7789.h"
 #define reset_color 0x0000;
-static uint16_t screen_pixels[ST7789_TFTWIDTH*ST7789_TFTWIDTH]={0};
-const bitmap screen_bitmap={ST7789_TFTHEIGHT,ST7789_TFTWIDTH, (uint16_t*)screen_pixels};
 
 
 
-static int inRange(int x,int y,const bitmap* obj);
+
+static inline int inRange(int x,int y,const bitmap* obj);
+
+static inline uint8_t pixelHi(uint16_t dot){
+  return  dot>>8;
+}
+
+static inline uint8_t pixelLo(uint16_t dot){
+  return dot&0xFF;
+}
+
+
 void reset_screen(){
     for(int i=0;i<screen_bitmap.height;i++){
         for(int j=0;j<screen_bitmap.width;j++){
@@ -16,7 +25,18 @@ void reset_screen(){
         }
     }
 }
-void set_obj(uint16_t x, uint16_t y,const bitmap* obj){
+
+void draw_screen() {
+  st7789_writeCmds();
+  for(int i=0;i<ST7789_TFTHEIGHT;i++){
+    for(int j=0;j<ST7789_TFTWIDTH;j++){
+      bcm2835_spi_transfer(pixelHi(screen_bitmap.bitmap[i*ST7789_TFTWIDTH+j]));
+      bcm2835_spi_transfer(pixelLo(screen_bitmap.bitmap[i*ST7789_TFTWIDTH+j]));
+    }
+  }
+}
+
+void set_obj(int x, int y,const bitmap* obj){
   if(obj==NULL){
    return;
   }
@@ -29,14 +49,14 @@ void set_obj(uint16_t x, uint16_t y,const bitmap* obj){
       }
   }
 }
-
-uint8_t pixelHi(uint16_t dot){
-   return  dot>>8;
-}
-uint8_t pixelLo(uint16_t dot){
-  return dot&0xFF;
+void set_map() {
 }
 
+static inline int inRange(int x,int y,const bitmap* obj){
+  return 0<=x && x+obj->width<screen_bitmap.width &&0<=y && y+obj->height<screen_bitmap.height;
+}
+
+/*
 void test_screen(){
   uint16_t bg_color=0x0000;
   reset_screen();
@@ -55,13 +75,9 @@ void test_screen(){
 
   for(int i=0;i<ST7789_TFTHEIGHT;i++){
     for(int j=0;j<ST7789_TFTWIDTH;j++){
-      bcm2835_spi_transfer(pixelHi(screen_pixels[i*ST7789_TFTWIDTH+j]));
-      bcm2835_spi_transfer(pixelLo(screen_pixels[i*ST7789_TFTWIDTH+j]));
+      bcm2835_spi_transfer(pixelHi(screen_bitmap.bitmap[i*ST7789_TFTWIDTH+j]));
+      bcm2835_spi_transfer(pixelLo(screen_bitmap.bitmap[i*ST7789_TFTWIDTH+j]));
     }
   }
-
 }
-
-static int inRange(int x,int y,const bitmap* obj){
-  return 0<=x && x+obj->width<screen_bitmap.width &&0<=y && y+obj->height<screen_bitmap.height;
-}
+*/
