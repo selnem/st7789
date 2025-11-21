@@ -115,14 +115,15 @@ int main(void) {
     printf("Waiting for data... (Press Ctrl+C to exit)\n");
 
     // 4. Receive data continuously
-    char rx_buffer[RX_BUFFER_SIZE];
-    // Clear the buffer
-    memset(rx_buffer, 0, RX_BUFFER_SIZE); 
-    while(1) {
-        
     
+    // Clear the buffer
+    char rx_buffer[RX_BUFFER_SIZE];
+    memset(rx_buffer, 0, RX_BUFFER_SIZE); 
+    
+    int readCnt=0;
+    while(1) {
         // Read up to RX_BUFFER_SIZE - 1 bytes
-        int n_read = read(fd, rx_buffer, RX_BUFFER_SIZE - 1); 
+        int n_read = read(fd, rx_buffer+readCnt, (RX_BUFFER_SIZE - readCnt+1)); 
         
         if (n_read < 0) {
             // Check for specific error (EAGAIN means timeout/no data)
@@ -134,9 +135,9 @@ int main(void) {
             }
         } else if (n_read > 0) {
             // Null-terminate the string
-            rx_buffer[n_read] = '\0';
-            printf("Received %d bytes:\n", n_read);
-            if(rx_buffer[n_read-1]=='\n'){
+            rx_buffer[readCnt] = '\0';
+            printf("Received %d bytes:\n", readCnt);
+            if(rx_buffer[readCnt-1]=='\n'){
                 printf("--- received data ---\n%s\n", rx_buffer);
                 break;
             }
