@@ -112,34 +112,40 @@ int main(void) {
     }
 
     printf("Serial port %s opened successfully at 9600 baud.\n", SERIAL_PORT);
-    printf("Waiting for data... (Press Ctrl+C to exit)\n");
 
-    // 4. Receive data continuously
-    char rx_buffer[RX_BUFFER_SIZE];
-    while(1) {
-        memset(rx_buffer, 0, RX_BUFFER_SIZE); // Clear the buffer
+    // 3. Transmit data
+    printf("Sending message: '%s'\n", TX_MESSAGE);
+    int n_written = write(fd, TX_MESSAGE, strlen(TX_MESSAGE));
+    if (n_written < 0) {
+        perror("Error writing to serial port");
+    } else {
+        printf("Successfully wrote %d bytes.\n", n_written);
+    }
     
-        // Read up to RX_BUFFER_SIZE - 1 bytes
-        int n_read = read(fd, rx_buffer, RX_BUFFER_SIZE - 1); 
-        
-        if (n_read < 0) {
-            // Check for specific error (EAGAIN means timeout/no data)
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                continue;
-            } else {
-                perror("Error reading from serial port");
-                break;
-            }
-        } else if (n_read > 0) {
-            // Null-terminate the string
-            rx_buffer[n_read] = '\0';
-            printf("Received %d bytes:\n", n_read);
-            if(rx_buffer[n_read-1]=='\n'){
-                printf("--- received data ---\n%s\n", rx_buffer);
-                break;
-            }
-            
+    // Give the receiver a moment to respond
+    usleep(100000); // 100ms delay
+
+    // 4. Receive data
+    char rx_buffer[RX_BUFFER_SIZE];
+    memset(rx_buffer, 0, RX_BUFFER_SIZE); // Clear the buffer
+    
+    // Read up to RX_BUFFER_SIZE - 1 bytes
+    int n_read = read(fd, rx_buffer, RX_BUFFER_SIZE - 1); 
+
+    if (n_read < 0) {
+        // Check for specific error (EAGAIN means timeout/no data)
+        if (errno == EAGAIN) {
+            printf("No data received (Timeout).\n");
+        } else {
+            perror("Error reading from serial port");
         }
+    } else if (n_read > 0) {
+        // Null-terminate the string
+        rx_buffer[n_read] = '\0';
+        printf("Received %d bytes:\n", n_read);
+        printf("--- Start of received data ---\n%s\n--- End of received data ---\n", rx_buffer);
+    } else {
+        printf("Received 0 bytes.\n");
     }
 
     // 5. Cleanup
