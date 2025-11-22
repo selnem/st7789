@@ -1,5 +1,7 @@
 #include <bcm2835.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <time.h>
 #include "st7789.h"
 
 
@@ -106,36 +108,6 @@ void st7789_drawDot(int x, int y, uint16_t color) {
     }
 }
 
-void st7789_drawFrame(int x, int y, uint16_t dotColor, uint16_t bgColor) {
-    // Set full-screen address window
-    writeCommand(ST7789_RASET);
-    writeData(0); writeData(0);
-    writeData((ST7789_TFTHEIGHT >> 8) & 0xFF); writeData(ST7789_TFTHEIGHT & 0xFF);
-
-    writeCommand(ST7789_CASET);
-    writeData(0); writeData(0);
-    writeData((ST7789_TFTWIDTH >> 8) & 0xFF); writeData(ST7789_TFTWIDTH & 0xFF);
-
-    writeCommand(ST7789_RAMWR);
-    bcm2835_gpio_set(TFT_DC);
-
-    uint8_t dotHi = dotColor >> 8, dotLo = dotColor & 0xFF;
-    uint8_t bgHi = bgColor >> 8, bgLo = bgColor & 0xFF;
-
-    for (int iy = 0; iy < ST7789_TFTHEIGHT; iy++) {
-        for (int ix = 0; ix < ST7789_TFTWIDTH; ix++) {
-            int dx = ix - x;
-            int dy = iy - y;
-            if (dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1) {
-                bcm2835_spi_transfer(dotHi);
-                bcm2835_spi_transfer(dotLo);
-            } else {
-                bcm2835_spi_transfer(bgHi);
-                bcm2835_spi_transfer(bgLo);
-            }
-        }
-    }
-}
 
 void st7789_joystick_init() {
     bcm2835_gpio_fsel(JOYSTICK_UP, BCM2835_GPIO_FSEL_INPT);
@@ -168,4 +140,65 @@ void st7789_writeCmds() {
 
     writeCommand(ST7789_RAMWR);
     bcm2835_gpio_set(TFT_DC);
+}
+
+
+#define DEBOUNCE_DELAY_MS 50
+
+
+static uint8_t last_button_a_state = 1;
+static uint8_t last_button_b_state = 1;
+static uint32_t last_button_a_change_time = 0;
+static uint32_t last_button_b_change_time = 0;
+
+void st7789_buttons_init() {
+    // Configure button pins as inputs with pull-up resistors
+    bcm2835_gpio_fsel(BUTTON_A, BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_set_pud(BUTTON_A, BCM2835_GPIO_PUD_UP);
+    
+    bcm2835_gpio_fsel(BUTTON_B, BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_set_pud(BUTTON_B, BCM2835_GPIO_PUD_UP);
+    
+    // Small delay to allow pins to stabilize
+    delay(10);
+}
+
+ButtonState st7789_readButtons() {
+    ButtonState state;
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    uint32_t current_time_ms = (ts.tv_sec * 1000) + (ts.tv_nsec / 1000000);
+    
+    // Read raw button states (0 = pressed, 1 = not pressed due to pull-up)
+    uint8_t raw_a = (bcm2835_gpio_lev(BUTTON_A) == 0) ? 1 : 0;
+    uint8_t raw_b = (bcm2835_gpio_lev(BUTTON_B) == 0) ? 1 : 0;
+    
+    // Debounce button A
+    if (raw_a != last_button_a_state) {
+        // State changed, reset timer
+        last_button_a_change_time = current_time_ms;
+        last_button_a_state = raw_a;
+        state.a = 0;
+    } else {
+        if ((current_time_ms - last_button_a_change_time) >= DEBOUNCE_DELAY_MS) {
+            state.a = raw_a;
+        } else {
+            state.a = 0;
+        }
+    }
+    
+    // Debounce button B
+    if (raw_b != last_button_b_state) {
+        last_button_b_change_time = current_time_ms;
+        last_button_b_state = raw_b;
+        state.b = 0;
+    } else {
+        if ((current_time_ms - last_button_b_change_time) >= DEBOUNCE_DELAY_MS) {
+            state.b = raw_b;
+        } else {
+            state.b = 0;
+        }
+    }
+    
+    return state;
 }

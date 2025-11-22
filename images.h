@@ -10,3 +10,7 @@ typedef struct bitmap {
 
 extern const bitmap clr_circle_bitmap;
 extern const bitmap screen_bitmap;
+extern const bitmap bgBitMap;
+extern const bitmap airplane_bitmap;
+extern const bitmap pipes_bitmap;
+extern const bitmap gameOver_bitmap;

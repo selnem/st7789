@@ -1,3 +1,3 @@
-//
-// Created by 전성환 on 25. 11. 14.
-//
+#include<stdio.h>
+#include "images.h"
+#include "screen.h"

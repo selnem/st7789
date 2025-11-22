@@ -28,6 +28,10 @@
 #define JOYSTICK_LEFT   27
 #define JOYSTICK_RIGHT  23
 
+// Button pins (BCM numbering)
+#define BUTTON_A        5
+#define BUTTON_B        6
+
 
 void writeCommand(uint8_t cmd);
 
@@ -37,10 +41,6 @@ void st7789_init();
 
 void st7789_fillScreen(uint16_t color);
 
-void st7789_drawDot(int x, int y, uint16_t color);
-
-// Render full frame each time based on dot position
-void st7789_drawFrame(int x, int y, uint16_t dotColor, uint16_t bgColor);
 
 void st7789_joystick_init();
 void st7789_writeCmds();
@@ -52,3 +52,12 @@ typedef struct {
 } JoystickState;
 
 JoystickState st7789_readJoystick();
+
+// Button functions
+void st7789_buttons_init();
+typedef struct {
+    uint8_t a;
+    uint8_t b;
+} ButtonState;
+
+ButtonState st7789_readButtons();
