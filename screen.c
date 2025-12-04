@@ -35,6 +35,9 @@ void draw_screen() {
     }
   }
 }
+inline int oneDToTwoD(int i,int j, const bitmap *obj) {
+  return obj->width*i+j;
+}
 
 void set_obj(int x, int y,const bitmap* obj){
   if(obj==NULL){
@@ -45,17 +48,26 @@ void set_obj(int x, int y,const bitmap* obj){
   }
   for(int i=0;i<obj->height;i++){
       for(int j=0;j<obj->width;j++){
-        screen_bitmap.bitmap[(x+i)*screen_bitmap.width+(y+j)]=obj->bitmap[i*obj->width+j];
+        screen_bitmap.bitmap[oneDToTwoD(x+i,y+j,&screen_bitmap)]=obj->bitmap[oneDToTwoD(i,j,obj)];
       }
   }
 }
-void set_map() {
+
+
+void set_map(const bitmap* obj, int idx) {
+  if (obj==NULL) {
+    return;
+  }
+  for (int i=0;i<obj->height;i++) {
+    for (int j=0;j<screen_bitmap.width;j++) {
+      screen_bitmap.bitmap[oneDToTwoD(i,j,&screen_bitmap)]=obj->bitmap[oneDToTwoD(i,j+idx,obj)];
+    }
+  }
 }
 
 static inline int inRange(int x,int y,const bitmap* obj){
   return 0<=x && x+obj->width<screen_bitmap.width &&0<=y && y+obj->height<screen_bitmap.height;
 }
-
 
 
 

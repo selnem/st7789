@@ -152,14 +152,12 @@ static uint32_t last_button_a_change_time = 0;
 static uint32_t last_button_b_change_time = 0;
 
 void st7789_buttons_init() {
-    // Configure button pins as inputs with pull-up resistors
     bcm2835_gpio_fsel(BUTTON_A, BCM2835_GPIO_FSEL_INPT);
     bcm2835_gpio_set_pud(BUTTON_A, BCM2835_GPIO_PUD_UP);
     
     bcm2835_gpio_fsel(BUTTON_B, BCM2835_GPIO_FSEL_INPT);
     bcm2835_gpio_set_pud(BUTTON_B, BCM2835_GPIO_PUD_UP);
-    
-    // Small delay to allow pins to stabilize
+
     delay(10);
 }
 
@@ -168,14 +166,12 @@ ButtonState st7789_readButtons() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     uint32_t current_time_ms = (ts.tv_sec * 1000) + (ts.tv_nsec / 1000000);
-    
-    // Read raw button states (0 = pressed, 1 = not pressed due to pull-up)
+
     uint8_t raw_a = (bcm2835_gpio_lev(BUTTON_A) == 0) ? 1 : 0;
     uint8_t raw_b = (bcm2835_gpio_lev(BUTTON_B) == 0) ? 1 : 0;
-    
-    // Debounce button A
+
     if (raw_a != last_button_a_state) {
-        // State changed, reset timer
+
         last_button_a_change_time = current_time_ms;
         last_button_a_state = raw_a;
         state.a = 0;
@@ -186,8 +182,6 @@ ButtonState st7789_readButtons() {
             state.a = 0;
         }
     }
-    
-    // Debounce button B
     if (raw_b != last_button_b_state) {
         last_button_b_change_time = current_time_ms;
         last_button_b_state = raw_b;
