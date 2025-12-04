@@ -3,6 +3,7 @@
 #include "screen.h"
 #include "game.h"
 #include "hitbox.h"
+#include "st7789.h"
 #define MAXSPEED 20
 
 
@@ -28,7 +29,9 @@ void pipes_slide() {
     
     PipesSlideIdx += slideSpeed;
 
-    if (PipesSlideIdx >= pipes_bitmap.width) {
+    // 파이프가 화면을 완전히 벗어난 후에 리셋
+    // 파이프 맵 너비(791) + 화면 너비(240) = 1031을 넘으면 파이프가 완전히 사라짐
+    if (PipesSlideIdx >= pipes_bitmap.width + ST7789_TFTWIDTH) {
         PipesSlideIdx = -180;
     }
     
