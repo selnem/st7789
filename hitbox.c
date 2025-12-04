@@ -3,6 +3,7 @@
 //
 
 #include <stdint.h>
+#include <stddef.h>
 #include "images.h"
 #include "screen.h"
 #include "game.h"
@@ -74,15 +75,8 @@ int set_hitbox_airplane(int x, int y, const bitmap* obj) {
 int check_collision() {
     // 히트박스 버퍼에서 빨강(파이프)과 녹색(비행기)이 겹치는지 확인
     // 비행기를 그린 후, 비행기 위치에 파이프 색상이 있는지 확인
-    for (int i = 0; i < hitbox_bitmap.height; i++) {
-        for (int j = 0; j < hitbox_bitmap.width; j++) {
-            uint16_t pixel = hitbox_bitmap.bitmap[oneDToTwoD_hitbox(i, j, &hitbox_bitmap)];
-            // 녹색(비행기)이 있는 위치에서 빨강(파이프)도 있는지 확인
-            // 하지만 한 픽셀에는 하나의 값만 저장되므로,
-            // 비행기를 그릴 때 파이프 색상이 이미 있는지 확인하는 방식 사용
-            // 이 함수는 전체 스캔용 (사용하지 않을 수도 있음)
-        }
-    }
+    // 이 함수는 전체 스캔용 (사용하지 않을 수도 있음)
+    (void)hitbox_bitmap;  // unused variable 경고 방지
     return 0;
 }
 

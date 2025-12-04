@@ -35,7 +35,7 @@ void draw_screen() {
     }
   }
 }
-inline int oneDToTwoD(int i,int j, const bitmap *obj) {
+static inline int oneDToTwoD(int i,int j, const bitmap *obj) {
   return obj->width*i+j;
 }
 

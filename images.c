@@ -33316,8 +33316,9 @@ static const uint16_t pipes_pixels[166901] = {
 };
 
 static uint16_t screen_pixels[57600]={0};
-
+static uint16_t hitbox_pixels[57600]={0};
 const bitmap screen_bitmap = { 240, 240, (uint16_t*)screen_pixels };
+const bitmap hitbox_bitmap = { 240, 240, (uint16_t*)hitbox_pixels };
 const bitmap airplane_bitmap = { 48, 48, (uint16_t*)airplane_pixels };
 const bitmap bgMap_bitmap = { 720, 240, (uint16_t*)bgMap_pixels };
 const bitmap gameOver_bitmap = { 240, 240, (uint16_t*)gameOver_pixels };
