@@ -16,7 +16,7 @@ int airplaneInRange(int x, int y) {
 
 int main(int argc, char **argv) {
     if (!bcm2835_init()) {
-        printf("bcm2835_init failed. Are you running as root?\n");
+        printf("bcm2835_init failed");
         return 1;
     }
     
@@ -31,8 +31,6 @@ int main(int argc, char **argv) {
     // 비행기 초기 위치 (화면 중앙)
     int airplane_x = (screen_bitmap.height - airplane_bitmap.height) / 2;
     int airplane_y = 50;
-    
-    printf("Game started. Use joystick to move airplane.\n");
     
     while (1) {
         // 화면 초기화

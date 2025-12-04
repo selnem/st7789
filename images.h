@@ -14,4 +14,3 @@ extern const bitmap gameOver_bitmap;
 extern const bitmap bgMap_bitmap;
 extern const bitmap screen_bitmap;
 extern const bitmap hitbox_bitmap;
-extern const bitmap hitbox_bitmap;
