@@ -51,7 +51,7 @@ void set_obj(int x, int y,const bitmap* obj){
         uint16_t pixel = obj->bitmap[oneDToTwoD(i,j,obj)];
         // 0x0000 픽셀은 투명이므로 무시
         if(pixel != 0x0000) {
-          screen_bitmap.bitmap[oneDToTwoD(x+i,y+j,&screen_bitmap)] = pixel;
+          screen_bitmap.bitmap[oneDToTwoD(y+i,x+j,&screen_bitmap)] = pixel;
         }
       }
   }

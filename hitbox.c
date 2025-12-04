@@ -55,7 +55,6 @@ int set_hitbox_airplane(int x, int y, const bitmap* obj) {
             for (int j = 0; j < obj->width && (y + j) < hitbox_bitmap.width; j++) {
                 if (y + j >= 0) {
                     uint16_t pixel = obj->bitmap[oneDToTwoD_hitbox(i, j, obj)];
-                    // 0x0000 픽셀은 투명이므로 무시
                     if (pixel != 0x0000) {
                         int pos = oneDToTwoD_hitbox(x + i, y + j, &hitbox_bitmap);
                         // 비행기를 그리기 전에 파이프(빨강)가 있는지 확인
@@ -73,10 +72,8 @@ int set_hitbox_airplane(int x, int y, const bitmap* obj) {
 }
 
 int check_collision() {
-    // 히트박스 버퍼에서 빨강(파이프)과 녹색(비행기)이 겹치는지 확인
-    // 비행기를 그린 후, 비행기 위치에 파이프 색상이 있는지 확인
-    // 이 함수는 전체 스캔용 (사용하지 않을 수도 있음)
-    (void)hitbox_bitmap;  // unused variable 경고 방지
+
+    (void)hitbox_bitmap;
     return 0;
 }
 

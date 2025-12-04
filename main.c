@@ -10,8 +10,8 @@
 // 비행기 위치 범위 체크 함수
 int airplaneInRange(int x, int y) {
     // 화면 범위 내에 있는지 확인
-    return (x >= 0 && x + airplane_bitmap.height <= screen_bitmap.height &&
-            y >= 0 && y + airplane_bitmap.width <= screen_bitmap.width);
+    return (y >= 0 && y + airplane_bitmap.height <= screen_bitmap.height &&
+            x >= 0 && x + airplane_bitmap.width <= screen_bitmap.width);
 }
 
 int main(int argc, char **argv) {
@@ -53,8 +53,7 @@ int main(int argc, char **argv) {
         // 화면에 출력
         draw_screen();
         
-        // 프레임 딜레이 (약 60 FPS)
-        usleep(1);  // 약 16.666ms (1/60초)
+
     }
     
     bcm2835_spi_end();
