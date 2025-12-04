@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
         draw_screen();
         
         // 프레임 딜레이 (약 60 FPS)
-        usleep(16666);  // 약 16.666ms (1/60초)
+        usleep(1);  // 약 16.666ms (1/60초)
     }
     
     bcm2835_spi_end();
