@@ -2,7 +2,111 @@
 // Created by 전성환 on 25. 11. 28.
 //
 
-#ifndef HITBOX_C_H
-#define HITBOX_C_H
+#include <stdint.h>
+#include "images.h"
+#include "screen.h"
+#include "game.h"
 
-#endif //HITBOX_C_H
+#define HITBOX_COLOR_PIPE 0xF800  // 빨강
+#define HITBOX_COLOR_AIRPLANE 0x07E0  // 녹색
+
+static inline int oneDToTwoD_hitbox(int i, int j, const bitmap *obj) {
+    return obj->width * i + j;
+}
+
+void reset_hitbox_screen() {
+    for(int i = 0; i < hitbox_bitmap.height; i++) {
+        for(int j = 0; j < hitbox_bitmap.width; j++) {
+            hitbox_bitmap.bitmap[i * hitbox_bitmap.width + j] = 0x0000;
+        }
+    }
+}
+
+void set_hitbox_pipes(const bitmap* obj, int idx, int y_offset) {
+    if (obj == NULL) {
+        return;
+    }
+    // 파이프를 빨강으로 히트박스에 그리기
+    for (int i = 0; i < obj->height && (i + y_offset) < hitbox_bitmap.height; i++) {
+        if (i + y_offset >= 0) {
+            for (int j = 0; j < hitbox_bitmap.width; j++) {
+                int source_idx = j + idx;
+                if (source_idx >= 0 && source_idx < obj->width) {
+                    uint16_t pixel = obj->bitmap[oneDToTwoD_hitbox(i, source_idx, obj)];
+                    // 0x0000 픽셀은 투명이므로 무시, 그 외는 빨강으로 표시
+                    if (pixel != 0x0000) {
+                        hitbox_bitmap.bitmap[oneDToTwoD_hitbox(i + y_offset, j, &hitbox_bitmap)] = HITBOX_COLOR_PIPE;
+                    }
+                }
+            }
+        }
+    }
+}
+
+int set_hitbox_airplane(int x, int y, const bitmap* obj) {
+    if (obj == NULL) {
+        return 0;
+    }
+    int collision = 0;
+    // 비행기를 녹색으로 히트박스에 그리기 (그리면서 충돌 확인)
+    for (int i = 0; i < obj->height && (x + i) < hitbox_bitmap.height; i++) {
+        if (x + i >= 0) {
+            for (int j = 0; j < obj->width && (y + j) < hitbox_bitmap.width; j++) {
+                if (y + j >= 0) {
+                    uint16_t pixel = obj->bitmap[oneDToTwoD_hitbox(i, j, obj)];
+                    // 0x0000 픽셀은 투명이므로 무시
+                    if (pixel != 0x0000) {
+                        int pos = oneDToTwoD_hitbox(x + i, y + j, &hitbox_bitmap);
+                        // 비행기를 그리기 전에 파이프(빨강)가 있는지 확인
+                        if (hitbox_bitmap.bitmap[pos] == HITBOX_COLOR_PIPE) {
+                            collision = 1;  // 충돌 발생
+                        }
+                        // 비행기를 녹색으로 표시
+                        hitbox_bitmap.bitmap[pos] = HITBOX_COLOR_AIRPLANE;
+                    }
+                }
+            }
+        }
+    }
+    return collision;
+}
+
+int check_collision() {
+    // 히트박스 버퍼에서 빨강(파이프)과 녹색(비행기)이 겹치는지 확인
+    // 비행기를 그린 후, 비행기 위치에 파이프 색상이 있는지 확인
+    for (int i = 0; i < hitbox_bitmap.height; i++) {
+        for (int j = 0; j < hitbox_bitmap.width; j++) {
+            uint16_t pixel = hitbox_bitmap.bitmap[oneDToTwoD_hitbox(i, j, &hitbox_bitmap)];
+            // 녹색(비행기)이 있는 위치에서 빨강(파이프)도 있는지 확인
+            // 하지만 한 픽셀에는 하나의 값만 저장되므로,
+            // 비행기를 그릴 때 파이프 색상이 이미 있는지 확인하는 방식 사용
+            // 이 함수는 전체 스캔용 (사용하지 않을 수도 있음)
+        }
+    }
+    return 0;
+}
+
+int check_collision_at_position(int x, int y, const bitmap* obj) {
+    if (obj == NULL) {
+        return 0;
+    }
+    // 비행기 위치에서 파이프(빨강)와 겹치는지 확인
+    for (int i = 0; i < obj->height && (x + i) < hitbox_bitmap.height; i++) {
+        if (x + i >= 0) {
+            for (int j = 0; j < obj->width && (y + j) < hitbox_bitmap.width; j++) {
+                if (y + j >= 0) {
+                    uint16_t pixel = obj->bitmap[oneDToTwoD_hitbox(i, j, obj)];
+                    // 비행기의 실제 픽셀(0x0000이 아닌) 위치에서
+                    if (pixel != 0x0000) {
+                        // 히트박스 버퍼에 파이프(빨강)가 있는지 확인
+                        uint16_t hitbox_pixel = hitbox_bitmap.bitmap[oneDToTwoD_hitbox(x + i, y + j, &hitbox_bitmap)];
+                        if (hitbox_pixel == HITBOX_COLOR_PIPE) {
+                            return 1;  // 충돌 발생
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 0;  // 충돌 없음
+}
