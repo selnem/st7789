@@ -12,16 +12,13 @@ static int PipesSlideIdx=-180;
 static int slideSpeed=1;
 const int acceleration=2;
 
-
 void map_slide() {
     MapSlideIdx += slideSpeed;
 
-    int w = bgMap_bitmap.width-240;
+    const int w = bgMap_bitmap.width-240;
 
     MapSlideIdx %= w;
-    if (MapSlideIdx < 0) {
-        MapSlideIdx += w;
-    }
+
     
 
     set_map(&bgMap_bitmap, MapSlideIdx);
@@ -30,12 +27,14 @@ void map_slide() {
 void pipes_slide() {
     PipesSlideIdx += slideSpeed;
 
-    int w = pipes_bitmap.width-240;
+    const int w = pipes_bitmap.width-240;
 
-    PipesSlideIdx %= w;
-    if (PipesSlideIdx < 0) {
-        PipesSlideIdx += w;
+    if (PipesSlideIdx>0) {
+        PipesSlideIdx %= w;
     }
+
+
+
 
 
     int y_offset = 0;
