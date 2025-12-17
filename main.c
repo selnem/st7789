@@ -12,6 +12,10 @@ int airplaneInRange(int x, int y) {
     // 화면 범위 내에 있는지 확인
     return (y >= 0 && y + airplane_bitmap.height <= screen_bitmap.height &&
             x >= 0 && x + airplane_bitmap.width <= screen_bitmap.width);
+    //cassert assert 써서 배열 참조 넘는지 판단하는 디버깅을
+}
+int gameLogic() {
+
 }
 
 int main(int argc, char **argv) {
