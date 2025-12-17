@@ -101,7 +101,10 @@ void set_map_pipes(const bitmap* obj, int idx, int y_offset) {
   for (int i=0;i<obj->height && (i+y_offset)<screen_bitmap.height;i++) {
     if (i+y_offset >= 0) {  // 화면 범위 체크
       for (int j=0;j<screen_bitmap.width;j++) {
-        int source_idx = (base_idx + j) % width;
+
+        int source_idx = base_idx + j;
+        if (source_idx<0) continue;
+        source_idx%=width;
         uint16_t pixel = obj->bitmap[oneDToTwoD(i,source_idx,obj)];
         if(pixel != 0x0000) {
           screen_bitmap.bitmap[oneDToTwoD(i+y_offset,j,&screen_bitmap)] = pixel;
