@@ -84,20 +84,19 @@ void set_map(const bitmap* obj, int idx) {
   }
 }
 
-void set_map_pipes(const bitmap* obj, int idx, int y_offset) {
+void set_map_pipes(const bitmap* obj, int idx) {
   if (obj==NULL) {
     return;
   }
-  for (int i=0;i<obj->height && (i+y_offset)<screen_bitmap.height;i++) {
-    if (i+y_offset >= 0) {  // 화면 범위 체크
-      for (int j=0;j<screen_bitmap.width;j++) {
-        // idx가 음수인 경우 (파이프가 화면 오른쪽에서 시작하는 경우) 처리
-        int source_idx = j + idx;
-        if (source_idx >= 0 && source_idx < obj->width) {
-          uint16_t pixel = obj->bitmap[oneDToTwoD(i,source_idx,obj)];
-          if(pixel != 0x0000) {
-            screen_bitmap.bitmap[oneDToTwoD(i+y_offset,j,&screen_bitmap)] = pixel;
-          }
+  for (int i=0;i<obj->height && i<screen_bitmap.height;i++) {
+    for (int j=0;j<screen_bitmap.width;j++) {
+      // idx가 음수인 경우 (파이프가 화면 오른쪽에서 시작하는 경우) 처리
+      int source_idx = j + idx;
+      if (source_idx >= 0 ) {
+        source_idx %=obj->width;
+        uint16_t pixel = obj->bitmap[oneDToTwoD(i,source_idx,obj)];
+        if(pixel != 0x0000) {
+          screen_bitmap.bitmap[oneDToTwoD(i,j,&screen_bitmap)] = pixel;
         }
       }
     }
@@ -113,28 +112,3 @@ static inline int inRange(int x,int y,const bitmap* obj){
 
 
 
-/*
-void test_screen(){
-  uint16_t bg_color=0x0000;
-  reset_screen();
-  set_obj(30,30,&clr_circle_bitmap);
-  // Set full-screen address window
-  writeCommand(ST7789_RASET);
-  writeData(0); writeData(0);
-  writeData((ST7789_TFTHEIGHT >> 8) & 0xFF); writeData(ST7789_TFTHEIGHT & 0xFF);
-
-  writeCommand(ST7789_CASET);
-  writeData(0); writeData(0);
-  writeData((ST7789_TFTWIDTH >> 8) & 0xFF); writeData(ST7789_TFTWIDTH & 0xFF);
-
-  writeCommand(ST7789_RAMWR);
-  bcm2835_gpio_set(TFT_DC);
-
-  for(int i=0;i<ST7789_TFTHEIGHT;i++){
-    for(int j=0;j<ST7789_TFTWIDTH;j++){
-      bcm2835_spi_transfer(pixelHi(screen_bitmap.bitmap[i*ST7789_TFTWIDTH+j]));
-      bcm2835_spi_transfer(pixelLo(screen_bitmap.bitmap[i*ST7789_TFTWIDTH+j]));
-    }
-  }
-}
-*/

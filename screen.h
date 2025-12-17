@@ -4,4 +4,4 @@ void draw_screen();
 void reset_screen();
 void set_obj(int x, int y,const bitmap* obj);
 void set_map(const bitmap* obj, int idx);
-void set_map_pipes(const bitmap* obj, int idx, int y_offset);
+void set_map_pipes(const bitmap* obj, int idx);

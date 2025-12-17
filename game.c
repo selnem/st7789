@@ -29,16 +29,13 @@ void pipes_slide() {
         PipesSlideIdx %= w;
     }
 
-    int y_offset = 0;
-    set_map_pipes(&pipes_bitmap, PipesSlideIdx, y_offset);
+    set_map_pipes(&pipes_bitmap, PipesSlideIdx);
 }
 
 void update_hitbox_screen(int airplane_x, int airplane_y) {
 
     reset_hitbox_screen();
-    
-    int y_offset = 0;
-    set_hitbox_pipes(&pipes_bitmap, PipesSlideIdx, y_offset);
+    set_hitbox_pipes(&pipes_bitmap, PipesSlideIdx);
     
  
 }

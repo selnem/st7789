@@ -23,21 +23,19 @@ void reset_hitbox_screen() {
     }
 }
 
-void set_hitbox_pipes(const bitmap* obj, int idx, int y_offset) {
+void set_hitbox_pipes(const bitmap* obj, int idx) {
     if (obj == NULL) {
         return;
     }
     // 파이프를 빨강으로 히트박스에 그리기
-    for (int i = 0; i < obj->height && (i + y_offset) < hitbox_bitmap.height; i++) {
-        if (i + y_offset >= 0) {
-            for (int j = 0; j < hitbox_bitmap.width; j++) {
-                int source_idx = j + idx;
-                if (source_idx >= 0 && source_idx < obj->width) {
-                    uint16_t pixel = obj->bitmap[oneDToTwoD_hitbox(i, source_idx, obj)];
-                    // 0x0000 픽셀은 투명이므로 무시, 그 외는 빨강으로 표시
-                    if (pixel != 0x0000) {
-                        hitbox_bitmap.bitmap[oneDToTwoD_hitbox(i + y_offset, j, &hitbox_bitmap)] = HITBOX_COLOR_PIPE;
-                    }
+    for (int i = 0; i < obj->height && i < hitbox_bitmap.height; i++) {
+        for (int j = 0; j < hitbox_bitmap.width; j++) {
+            int source_idx = j + idx;
+            if (source_idx >= 0 && source_idx < obj->width) {
+                uint16_t pixel = obj->bitmap[oneDToTwoD_hitbox(i, source_idx, obj)];
+                // 0x0000 픽셀은 투명이므로 무시, 그 외는 빨강으로 표시
+                if (pixel != 0x0000) {
+                    hitbox_bitmap.bitmap[oneDToTwoD_hitbox(i, j, &hitbox_bitmap)] = HITBOX_COLOR_PIPE;
                 }
             }
         }
