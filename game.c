@@ -16,13 +16,13 @@ const int acceleration=2;
 void map_slide() {
     MapSlideIdx += slideSpeed;
 
-    int w = bgMap_bitmap.width;
-    if (w > 0) {
-        MapSlideIdx %= w;
-        if (MapSlideIdx < 0) {
-            MapSlideIdx += w;
-        }
+    int w = bgMap_bitmap.width-240;
+
+    MapSlideIdx %= w;
+    if (MapSlideIdx < 0) {
+        MapSlideIdx += w;
     }
+    
 
     set_map(&bgMap_bitmap, MapSlideIdx);
 }
@@ -30,13 +30,13 @@ void map_slide() {
 void pipes_slide() {
     PipesSlideIdx += slideSpeed;
 
-    int w = pipes_bitmap.width;
-    if (w > 0) {
-        PipesSlideIdx %= w;
-        if (PipesSlideIdx < 0) {
-            PipesSlideIdx += w;
-        }
+    int w = pipes_bitmap.width-240;
+
+    PipesSlideIdx %= w;
+    if (PipesSlideIdx < 0) {
+        PipesSlideIdx += w;
     }
+
 
     int y_offset = 0;
     set_map_pipes(&pipes_bitmap, PipesSlideIdx, y_offset);
