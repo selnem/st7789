@@ -16,8 +16,7 @@ void map_slide() {
     MapSlideIdx += slideSpeed;
 
     int w = bgMap_bitmap.width;
-    if (w > 0) {
-    }
+    MapSlideIdx%=w;
 
     set_map(&bgMap_bitmap, MapSlideIdx);
 }
