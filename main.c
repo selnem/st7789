@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     st7789_joystick_init();
     
     // 비행기 초기 위치 (화면 중앙)
-    int airplane_x = (screen_bitmap.height - airplane_bitmap.height) / 2;
+    int airplane_x = 50;
     int airplane_y = 50;
     
     while (1) {

@@ -14,51 +14,32 @@ const int acceleration=2;
 
 
 void map_slide() {
-    
     MapSlideIdx += slideSpeed;
-    
-   
-    if (MapSlideIdx >= bgMap_bitmap.width) {
-        MapSlideIdx = 0;
+
+    int w = bgMap_bitmap.width;
+    if (w > 0) {
+        MapSlideIdx %= w;
+        if (MapSlideIdx < 0) {
+            MapSlideIdx += w;
+        }
     }
-    
+
     set_map(&bgMap_bitmap, MapSlideIdx);
 }
 
 void pipes_slide() {
-    
     PipesSlideIdx += slideSpeed;
 
-    if (PipesSlideIdx >= pipes_bitmap.width) {
-        PipesSlideIdx = -180;
+    int w = pipes_bitmap.width;
+    if (w > 0) {
+        PipesSlideIdx %= w;
+        if (PipesSlideIdx < 0) {
+            PipesSlideIdx += w;
+        }
     }
-    
 
     int y_offset = 0;
-    
     set_map_pipes(&pipes_bitmap, PipesSlideIdx, y_offset);
-}
-
-void reset_map_slide() {
-    MapSlideIdx = 0;
-}
-
-void reset_pipes_slide() {
-    PipesSlideIdx = -180;
-}
-
-int get_map_slide_idx() {
-    return MapSlideIdx;
-}
-
-int get_pipes_slide_idx() {
-    return PipesSlideIdx;
-}
-
-void set_slide_speed(int speed) {
-    if (speed >= 0 && speed <= MAXSPEED) {
-        slideSpeed = speed;
-    }
 }
 
 void update_hitbox_screen(int airplane_x, int airplane_y) {
