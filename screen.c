@@ -20,37 +20,21 @@ static inline uint8_t pixelLo(uint16_t dot){
 
 
 void resetScreen(){
-    if (screen_bitmap.bitmap == NULL) {
-        return;
-    }
-    if (screen_bitmap.width == 0 || screen_bitmap.height == 0) {
-        return;
-    }
     for(int i=0;i<screen_bitmap.height;i++){
         for(int j=0;j<screen_bitmap.width;j++){
             int idx = i*screen_bitmap.width+j;
-            if (idx >= 0 && idx < screen_bitmap.width * screen_bitmap.height) {
-                screen_bitmap.bitmap[idx]=reset_color;
-            }
+            screen_bitmap.bitmap[idx]=reset_color;
         }
     }
 }
 
 void drawScreen() {
-  if (screen_bitmap.bitmap == NULL) {
-    return;
-  }
-  if (screen_bitmap.width == 0 || screen_bitmap.height == 0) {
-    return;
-  }
   st7789_writeCmds();
   for(int i=0;i<screen_bitmap.height && i<ST7789_TFTHEIGHT;i++){
     for(int j=0;j<screen_bitmap.width && j<ST7789_TFTWIDTH;j++){
       int idx = i*screen_bitmap.width+j;
-      if (idx >= 0 && idx < screen_bitmap.width * screen_bitmap.height) {
-        bcm2835_spi_transfer(pixelHi(screen_bitmap.bitmap[idx]));
-        bcm2835_spi_transfer(pixelLo(screen_bitmap.bitmap[idx]));
-      }
+      bcm2835_spi_transfer(pixelHi(screen_bitmap.bitmap[idx]));
+      bcm2835_spi_transfer(pixelLo(screen_bitmap.bitmap[idx]));
     }
     // 각 행 전송 후 작은 딜레이 (디스플레이 처리 시간 확보)
     if (i % 10 == 0 && i > 0) {
