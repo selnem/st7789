@@ -82,14 +82,13 @@ void updateInv(ButtonState now, ButtonState prev) {
 void airplaneMove(int *x, int *y, int baseSpeed,
                   ButtonState now, ButtonState prev) {
     if (x == NULL || y == NULL) return;
-
-    // A 키 에지 입력으로 대쉬 시작
+    //a누를시 대쉬 시작
     if (!dashing && now.a && !prev.a) {
         dashing = 1;
         dash_left = DASH_FRAMES;
     }
 
-    // 이동 처리 (대쉬 중이면 속도 증가)
+    // 이동 처리
     if (dashing) {
         moveObj(x, y, DASH_SPEED);
         if (--dash_left <= 0) {
@@ -155,7 +154,6 @@ int checkGameCollision(int airplaneX, int airplaneY) {
     if (dashing || invincible) {
         return 0;
     }
-    // 실제 히트박스 충돌은 hitbox.c 의 checkCollision 사용
     return checkCollision(pipes_idx, airplaneX, airplaneY);
 }
 
