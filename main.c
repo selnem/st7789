@@ -1,22 +1,7 @@
 #include <stdio.h>
 #include <bcm2835.h>
-#include <unistd.h>
 #include "st7789.h"
-#include "images.h"
-#include "screen.h"
 #include "game.h"
-#include "physics.h"
-
-// 비행기 위치 범위 체크 함수
-int airplaneInRange(int x, int y) {
-    // 화면 범위 내에 있는지 확인
-    return (y >= 0 && y + airplane_bitmap.height <= screen_bitmap.height-50 &&
-            x >= 0 && x + airplane_bitmap.width <= screen_bitmap.width-50);
-    //cassert assert 써서 배열 참조 넘는지 판단하는 디버깅을
-}
-int gameLogic() {
-
-}
 
 int main(int argc, char **argv) {
     if (!bcm2835_init()) {
@@ -31,31 +16,14 @@ int main(int argc, char **argv) {
 
     st7789_init();
     st7789_joystick_init();
+    st7789_buttons_init();  // 버튼 초기화
     
-    // 비행기 초기 위치 (화면 중앙)
-    int airplane_x = 50;
-    int airplane_y = 50;
+    // 게임 초기화
+    reset_game();
     
     while (1) {
-        // 화면 초기화
-        reset_screen();
-        
-        // 배경 스크롤
-        map_slide();
-        
-        // 파이프 스크롤
-        pipes_slide();
-        
-        // 조이스틱으로 비행기 이동
-        moveObj(&airplane_x, &airplane_y, 2, airplaneInRange);
-        
-        // 비행기 그리기
-        set_obj(airplane_x, airplane_y, &airplane_bitmap);
-        
-        // 화면에 출력
-        draw_screen();
-        
-
+        // 게임 플레이 (게임 오버 처리 포함)
+        play_game();
     }
     
     bcm2835_spi_end();

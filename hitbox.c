@@ -47,7 +47,6 @@ int set_hitbox_airplane(int x, int y, const bitmap* obj) {
     if (obj == NULL) {
         return 0;
     }
-    int collision = 0;
     // 비행기를 녹색으로 히트박스에 그리기 (그리면서 충돌 확인)
     for (int i = 0; i < obj->height && (x + i) < hitbox_bitmap.height; i++) {
         if (x + i >= 0) {
@@ -58,7 +57,7 @@ int set_hitbox_airplane(int x, int y, const bitmap* obj) {
                         int pos = oneDToTwoD_hitbox(x + i, y + j, &hitbox_bitmap);
                         // 비행기를 그리기 전에 파이프(빨강)가 있는지 확인
                         if (hitbox_bitmap.bitmap[pos] == HITBOX_COLOR_PIPE) {
-                            collision = 1;  // 충돌 발생
+                            return 1;  // 충돌 발생 - 바로 리턴
                         }
                         // 비행기를 녹색으로 표시
                         hitbox_bitmap.bitmap[pos] = HITBOX_COLOR_AIRPLANE;
@@ -67,36 +66,24 @@ int set_hitbox_airplane(int x, int y, const bitmap* obj) {
             }
         }
     }
-    return collision;
+    return 0;  // 충돌 없음
 }
 
 int check_collision() {
-
     (void)hitbox_bitmap;
     return 0;
 }
 
-int check_collision_at_position(int x, int y, const bitmap* obj) {
-    if (obj == NULL) {
-        return 0;
-    }
-    // 비행기 위치에서 파이프(빨강)와 겹치는지 확인
-    for (int i = 0; i < obj->height && (x + i) < hitbox_bitmap.height; i++) {
-        if (x + i >= 0) {
-            for (int j = 0; j < obj->width && (y + j) < hitbox_bitmap.width; j++) {
-                if (y + j >= 0) {
-                    uint16_t pixel = obj->bitmap[oneDToTwoD_hitbox(i, j, obj)];
-                    // 비행기의 실제 픽셀(0x0000이 아닌) 위치에서
-                    if (pixel != 0x0000) {
-                        // 히트박스 버퍼에 파이프(빨강)가 있는지 확인
-                        uint16_t hitbox_pixel = hitbox_bitmap.bitmap[oneDToTwoD_hitbox(x + i, y + j, &hitbox_bitmap)];
-                        if (hitbox_pixel == HITBOX_COLOR_PIPE) {
-                            return 1;  // 충돌 발생
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return 0;  // 충돌 없음
+// 히트박스 업데이트 및 충돌 체크 (파이프와 비행기 히트박스 업데이트 및 충돌 체크)
+int update_hitbox_and_check_collision(int pipes_slide_idx, int airplane_x, int airplane_y) {
+    // 히트박스 화면 초기화
+    reset_hitbox_screen();
+    
+    // 파이프를 히트박스에 표시
+    set_hitbox_pipes(&pipes_bitmap, pipes_slide_idx);
+    
+    // 비행기를 히트박스에 표시하고 충돌 체크 (반환값: 1=충돌, 0=없음)
+    int collision = set_hitbox_airplane(airplane_x, airplane_y, &airplane_bitmap);
+    
+    return collision;
 }
