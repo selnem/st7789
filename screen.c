@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <bcm2835.h>
+#include <unistd.h>
 #include "images.h"
 #include "st7789.h"
 #define reset_color 0x0000;
@@ -50,6 +51,10 @@ void draw_screen() {
         bcm2835_spi_transfer(pixelHi(screen_bitmap.bitmap[idx]));
         bcm2835_spi_transfer(pixelLo(screen_bitmap.bitmap[idx]));
       }
+    }
+    // 각 행 전송 후 작은 딜레이 (디스플레이 처리 시간 확보)
+    if (i % 10 == 0 && i > 0) {
+      usleep(1);  // 1마이크로초 딜레이
     }
   }
 }
