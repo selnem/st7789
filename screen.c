@@ -63,21 +63,13 @@ static inline int oneDToTwoD(int i,int j, const bitmap *obj) {
 }
 
 void setObj(int x, int y,const bitmap* obj){
-  if(obj==NULL){
-   return;
-  }
-  if(obj->bitmap == NULL){
-    return;
-  }
+
   if(!inRange(x,y,obj)){
     return;
   }
   for(int i=0;i<obj->height;i++){
       for(int j=0;j<obj->width;j++){
         int src_idx = oneDToTwoD(i,j,obj);
-        if (src_idx < 0 || src_idx >= obj->width * obj->height) {
-          continue;
-        }
         uint16_t pixel = obj->bitmap[src_idx];
         // 0x0000 픽셀은 투명이므로 무시
         if(pixel != 0x0000) {
@@ -92,32 +84,17 @@ void setObj(int x, int y,const bitmap* obj){
 
 
 void setMap(const bitmap* obj, int idx) {
-  if (obj==NULL) {
-    return;
-  }
-  if (obj->bitmap == NULL) {
-    return;
-  }
   int width = obj->width;
-  if (width == 0) {
-    return;
-  }
 
   // idx를 0 ~ width-1 범위로 정규화해서 원형 스크롤
   int base_idx = idx % width;
   if (base_idx < 0) {
     base_idx += width;
   }
-
-  // screen_bitmap 범위 내에서만 처리
-  int max_height = (obj->height < screen_bitmap.height) ? obj->height : screen_bitmap.height;
-  for (int i=0;i<max_height;i++) {
+  for (int i=0;i<obj->height;i++) {
     for (int j=0;j<screen_bitmap.width;j++) {
       int col = (base_idx + j) % width;
       int src_idx = oneDToTwoD(i,col,obj);
-      if (src_idx < 0 || src_idx >= obj->width * obj->height) {
-        continue;
-      }
       uint16_t pixel = obj->bitmap[src_idx];
       if(pixel != 0x0000) {
         int dst_idx = oneDToTwoD(i,j,&screen_bitmap);
@@ -130,15 +107,7 @@ void setMap(const bitmap* obj, int idx) {
 }
 
 void setMapPipes(const bitmap* obj, int idx) {
-  if (obj==NULL) {
-    return;
-  }
-  if (obj->bitmap == NULL) {
-    return;
-  }
-  if (obj->width == 0) {
-    return;
-  }
+
   for (int i=0;i<obj->height && i<screen_bitmap.height;i++) {
     for (int j=0;j<screen_bitmap.width;j++) {
       // idx가 음수인 경우 (파이프가 화면 오른쪽에서 시작하는 경우) 처리
@@ -146,9 +115,6 @@ void setMapPipes(const bitmap* obj, int idx) {
       if (source_idx >= 0 ) {
         source_idx %= obj->width;
         int src_idx = oneDToTwoD(i,source_idx,obj);
-        if (src_idx < 0 || src_idx >= obj->width * obj->height) {
-          continue;
-        }
         uint16_t pixel = obj->bitmap[src_idx];
         if(pixel != 0x0000) {
           int dst_idx = oneDToTwoD(i,j,&screen_bitmap);

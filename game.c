@@ -1,11 +1,9 @@
-#include<stdio.h>
 #include "images.h"
 #include "screen.h"
 #include "game.h"
-#include "hitbox.h"
 #include "physics.h"
 #include "st7789.h"
-static int gameOver = 0;  // 게임 오버 상태
+static int gameOver = 0;
 
 // 비행기 위치
 static int airplane_x = 50;
@@ -19,11 +17,9 @@ void resetGame() {
     airplane_x = 50;
     airplane_y = 50;
 
-    // 버튼 초기화
     prevButtons.a = 0;
     prevButtons.b = 0;
 
-    // 물리(대쉬 / Invincibility + 맵 슬라이딩) 초기화
     resetStatus();
     worldReset();
 }
@@ -63,7 +59,6 @@ static int handleGameOver(ButtonState buttons) {
 
 
 static void updateMap() {
-
     resetScreen();
 
     slideMap();
