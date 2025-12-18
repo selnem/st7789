@@ -22,7 +22,6 @@ int main(int argc, char **argv) {
     reset_game();
     
     while (1) {
-        // 게임 플레이 (게임 오버 처리 포함)
         play_game();
     }
     

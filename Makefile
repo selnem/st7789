@@ -1,4 +1,4 @@
-CFLAGS=-Wall -I/usr/local/include
+CFLAGS=-Wall -g -O0 -I/usr/local/include
 LDFLAGS=-l bcm2835 -L/usr/local/lib
 CC=gcc
 
