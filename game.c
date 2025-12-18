@@ -9,7 +9,7 @@
 #define FIXRATE 60
 
 
-#define DASH_FRAMES 5
+#define DASH_FRAMES 3
 #define DASH_SPEED  20
 
 static int MapSlideIdx=0;
