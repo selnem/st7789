@@ -5,12 +5,12 @@
 #include "hitbox.h"
 #include "physics.h"
 #include "st7789.h"
-#define MAXSPEED 40
+#define MAXSPEED 50
 #define FIXRATE 60
 
-// 대쉬 관련 설정
-#define DASH_FRAMES 3    // 대쉬가 유지되는 프레임 수
-#define DASH_SPEED  20   // 대쉬 속도 (기본 속도보다 크게)
+
+#define DASH_FRAMES 5
+#define DASH_SPEED  20
 
 static int MapSlideIdx=0;
 static int PipesSlideIdx=-180;
