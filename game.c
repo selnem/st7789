@@ -8,6 +8,10 @@
 #define MAXSPEED 40
 #define FIXRATE 60
 
+// 대쉬 관련 설정
+#define DASH_FRAMES 3    // 대쉬가 유지되는 프레임 수
+#define DASH_SPEED  20   // 대쉬 속도 (기본 속도보다 크게)
+
 static int MapSlideIdx=0;
 static int PipesSlideIdx=-180;
 static int slideSpeed=5;
@@ -17,6 +21,11 @@ const int airplaneSpeed=5;
 // 비행기 위치
 static int airplane_x = 50;
 static int airplane_y = 50;
+
+// 대쉬 상태
+static int is_dashing = 0;
+static int dash_frames_left = 0;
+static ButtonState prev_buttons = {0, 0};
 
 // 비행기 위치 범위 체크 함수
 static int airplaneInRange(int x, int y) {
@@ -31,6 +40,12 @@ void reset_game() {
     game_over = 0;
     airplane_x = 50;
     airplane_y = 50;
+
+    // 대쉬 상태 초기화
+    is_dashing = 0;
+    dash_frames_left = 0;
+    prev_buttons.a = 0;
+    prev_buttons.b = 0;
 }
 
 void map_slide() {
@@ -78,8 +93,8 @@ void show_game_over() {
 
 
 // 비행기 업데이트 (조이스틱 입력 처리)
-void update_airplane() {
-    moveObj(&airplane_x, &airplane_y, airplaneSpeed, airplaneInRange);
+static void update_airplane(int speed) {
+    moveObj(&airplane_x, &airplane_y, speed, airplaneInRange);
 }
 
 // 비행기 그리기
@@ -89,18 +104,25 @@ void draw_airplane() {
 
 // 게임 플레이 (모든 게임 로직 포함)
 void play_game() {
+    // 버튼 상태 공통 획득
+    ButtonState buttons = st7789_readButtons();
+
     // 게임 오버 상태 처리
     if (game_over) {
         // 게임 오버 화면 표시 (매 프레임 갱신)
         show_game_over();
         
-        // A와 B 버튼 동시 입력 체크
-        ButtonState buttons = st7789_readButtons();
+
         if (buttons.a && buttons.b) {
-            // 게임 재시작
             reset_game();
         }
+        prev_buttons = buttons;
         return;
+    }
+
+    if (!is_dashing && buttons.a && !prev_buttons.a) {
+        is_dashing = 1;
+        dash_frames_left = DASH_FRAMES;
     }
     
     // 화면 초기화
@@ -112,14 +134,25 @@ void play_game() {
     // 파이프 스크롤
     pipes_slide();
     
-    // 조이스틱으로 비행기 이동
-    update_airplane();
+    // 조이스틱으로 비행기 이동 (대쉬 중이면 빠르게)
+    if (is_dashing) {
+        update_airplane(DASH_SPEED);
+        dash_frames_left--;
+        if (dash_frames_left <= 0) {
+            is_dashing = 0;
+        }
+    } else {
+        update_airplane(airplaneSpeed);
+    }
     
-    if (update_hitbox_and_check_collision(PipesSlideIdx, airplane_x, airplane_y)) {
-        // 충돌 발생 - 게임 오버 처리
-        game_over = 1;
-        show_game_over();
-        return;
+    // 대쉬 중에는 충돌 판정 건너뛰기 (무적 대쉬)
+    if (!is_dashing) {
+        if (update_hitbox_and_check_collision(PipesSlideIdx, airplane_x, airplane_y)) {
+            game_over = 1;
+            show_game_over();
+            prev_buttons = buttons;
+            return;
+        }
     }
     
     // 비행기 그리기
@@ -130,4 +163,7 @@ void play_game() {
     
     // 가속 업데이트
     update_acceleration();
+
+    // 버튼 상태 저장 (다음 프레임에서 에지 검출용)
+    prev_buttons = buttons;
 }
