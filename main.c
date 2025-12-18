@@ -20,12 +20,10 @@ int main(int argc, char **argv) {
     st7789_buttons_init();  // 버튼 초기화
     
     // 게임 초기화
-    reset_game();
+    resetGame();
     
     while (1) {
-        play_game();
-        // 프레임 딜레이 (약 60 FPS)
-        usleep(16666);  // 16.666ms = 1/60초
+        playGame();
     }
     
     bcm2835_spi_end();
