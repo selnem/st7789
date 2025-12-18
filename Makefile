@@ -1,5 +1,5 @@
-CFLAGS=-Wall -g -O0 -fsanitize=address -fno-omit-frame-pointer -I/usr/local/include
-LDFLAGS=-fsanitize=address -latomic -l bcm2835 -L/usr/local/lib
+CFLAGS=-Wall -g -O0 -fsanitize=address -fno-omit-frame-pointer -static-libasan -I/usr/local/include
+LDFLAGS=-fsanitize=address -static-libasan -latomic -l bcm2835 -L/usr/local/lib
 CC=gcc
 
 all: main
