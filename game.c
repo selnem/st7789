@@ -9,13 +9,19 @@
 
 static int MapSlideIdx=0;
 static int PipesSlideIdx=-180;
-static int slideSpeed=1;
+static int slideSpeed=5;
 const int acceleration=2;
+
+void reset_game() {
+    MapSlideIdx=0;
+    PipesSlideIdx=-180;
+    slideSpeed=5;
+}
 
 void map_slide() {
     MapSlideIdx += slideSpeed;
 
-    int w = bgMap_bitmap.width;
+    const int w = bgMap_bitmap.width;
     MapSlideIdx%=w;
 
     set_map(&bgMap_bitmap, MapSlideIdx);
@@ -24,13 +30,21 @@ void map_slide() {
 void pipes_slide() {
     PipesSlideIdx += slideSpeed;
 
-    int w = pipes_bitmap.width;
+    const int w = pipes_bitmap.width;
     if (w > 0) {
         PipesSlideIdx %= w;
     }
 
     set_map_pipes(&pipes_bitmap, PipesSlideIdx);
 }
+void update_acceleration() {
+    static int cnt=0;
+    cnt++;
+    if (!(cnt%=20)&&slideSpeed<=MAXSPEED) {
+        slideSpeed+=acceleration;
+    }
+}
+
 
 void update_hitbox_screen(int airplane_x, int airplane_y) {
 

@@ -10,8 +10,8 @@
 // 비행기 위치 범위 체크 함수
 int airplaneInRange(int x, int y) {
     // 화면 범위 내에 있는지 확인
-    return (y >= 0 && y + airplane_bitmap.height <= screen_bitmap.height &&
-            x >= 0 && x + airplane_bitmap.width <= screen_bitmap.width);
+    return (y >= 0 && y + airplane_bitmap.height <= screen_bitmap.height-50 &&
+            x >= 0 && x + airplane_bitmap.width <= screen_bitmap.width-50);
     //cassert assert 써서 배열 참조 넘는지 판단하는 디버깅을
 }
 int gameLogic() {

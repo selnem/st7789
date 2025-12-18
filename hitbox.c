@@ -31,7 +31,8 @@ void set_hitbox_pipes(const bitmap* obj, int idx) {
     for (int i = 0; i < obj->height && i < hitbox_bitmap.height; i++) {
         for (int j = 0; j < hitbox_bitmap.width; j++) {
             int source_idx = j + idx;
-            if (source_idx >= 0 && source_idx < obj->width) {
+            if (source_idx >= 0) {
+                source_idx %= obj->width;  // screen의 set_map_pipes와 동일한 원형 처리
                 uint16_t pixel = obj->bitmap[oneDToTwoD_hitbox(i, source_idx, obj)];
                 // 0x0000 픽셀은 투명이므로 무시, 그 외는 빨강으로 표시
                 if (pixel != 0x0000) {

@@ -63,9 +63,6 @@ void set_map(const bitmap* obj, int idx) {
     return;
   }
   int width = obj->width;
-  if (width <= 0) {
-    return;
-  }
 
   // idx를 0 ~ width-1 범위로 정규화해서 원형 스크롤
   int base_idx = idx % width;
