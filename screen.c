@@ -43,15 +43,25 @@ void set_obj(int x, int y,const bitmap* obj){
   if(obj==NULL){
    return;
   }
+  if(obj->bitmap == NULL){
+    return;
+  }
   if(!inRange(x,y,obj)){
     return;
   }
   for(int i=0;i<obj->height;i++){
       for(int j=0;j<obj->width;j++){
-        uint16_t pixel = obj->bitmap[oneDToTwoD(i,j,obj)];
+        int src_idx = oneDToTwoD(i,j,obj);
+        if (src_idx < 0 || src_idx >= obj->width * obj->height) {
+          continue;
+        }
+        uint16_t pixel = obj->bitmap[src_idx];
         // 0x0000 픽셀은 투명이므로 무시
         if(pixel != 0x0000) {
-          screen_bitmap.bitmap[oneDToTwoD(y+i,x+j,&screen_bitmap)] = pixel;
+          int dst_idx = oneDToTwoD(y+i,x+j,&screen_bitmap);
+          if (dst_idx >= 0 && dst_idx < screen_bitmap.width * screen_bitmap.height) {
+            screen_bitmap.bitmap[dst_idx] = pixel;
+          }
         }
       }
   }
@@ -62,7 +72,13 @@ void set_map(const bitmap* obj, int idx) {
   if (obj==NULL) {
     return;
   }
+  if (obj->bitmap == NULL) {
+    return;
+  }
   int width = obj->width;
+  if (width == 0) {
+    return;
+  }
 
   // idx를 0 ~ width-1 범위로 정규화해서 원형 스크롤
   int base_idx = idx % width;
@@ -70,12 +86,21 @@ void set_map(const bitmap* obj, int idx) {
     base_idx += width;
   }
 
-  for (int i=0;i<obj->height;i++) {
+  // screen_bitmap 범위 내에서만 처리
+  int max_height = (obj->height < screen_bitmap.height) ? obj->height : screen_bitmap.height;
+  for (int i=0;i<max_height;i++) {
     for (int j=0;j<screen_bitmap.width;j++) {
       int col = (base_idx + j) % width;
-      uint16_t pixel = obj->bitmap[oneDToTwoD(i,col,obj)];
+      int src_idx = oneDToTwoD(i,col,obj);
+      if (src_idx < 0 || src_idx >= obj->width * obj->height) {
+        continue;
+      }
+      uint16_t pixel = obj->bitmap[src_idx];
       if(pixel != 0x0000) {
-        screen_bitmap.bitmap[oneDToTwoD(i,j,&screen_bitmap)] = pixel;
+        int dst_idx = oneDToTwoD(i,j,&screen_bitmap);
+        if (dst_idx >= 0 && dst_idx < screen_bitmap.width * screen_bitmap.height) {
+          screen_bitmap.bitmap[dst_idx] = pixel;
+        }
       }
     }
   }
@@ -85,15 +110,28 @@ void set_map_pipes(const bitmap* obj, int idx) {
   if (obj==NULL) {
     return;
   }
+  if (obj->bitmap == NULL) {
+    return;
+  }
+  if (obj->width == 0) {
+    return;
+  }
   for (int i=0;i<obj->height && i<screen_bitmap.height;i++) {
     for (int j=0;j<screen_bitmap.width;j++) {
       // idx가 음수인 경우 (파이프가 화면 오른쪽에서 시작하는 경우) 처리
       int source_idx = j + idx;
       if (source_idx >= 0 ) {
-        source_idx %=obj->width;
-        uint16_t pixel = obj->bitmap[oneDToTwoD(i,source_idx,obj)];
+        source_idx %= obj->width;
+        int src_idx = oneDToTwoD(i,source_idx,obj);
+        if (src_idx < 0 || src_idx >= obj->width * obj->height) {
+          continue;
+        }
+        uint16_t pixel = obj->bitmap[src_idx];
         if(pixel != 0x0000) {
-          screen_bitmap.bitmap[oneDToTwoD(i,j,&screen_bitmap)] = pixel;
+          int dst_idx = oneDToTwoD(i,j,&screen_bitmap);
+          if (dst_idx >= 0 && dst_idx < screen_bitmap.width * screen_bitmap.height) {
+            screen_bitmap.bitmap[dst_idx] = pixel;
+          }
         }
       }
     }
