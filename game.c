@@ -5,12 +5,6 @@
 #include "hitbox.h"
 #include "physics.h"
 #include "st7789.h"
-#define MAXSPEED 50
-#define FIXRATE 60
-
-
-#define DASH_FRAMES 3
-#define DASH_SPEED  20
 
 static int MapSlideIdx=0;
 static int PipesSlideIdx=-180;
@@ -23,9 +17,14 @@ static int airplane_x = 50;
 static int airplane_y = 50;
 
 // 대쉬 상태
-static int is_dashing = 0;
-static int dash_frames_left = 0;
+static int dashing = 0;
+static int dash_left = 0;
 static ButtonState prev_buttons = {0, 0};
+
+// Invincibility 상태
+static int invincible = 0;
+static int inv_left = 0;
+static int inv_cnt = MAX_INVINCIBILITY_COUNT;  // 남은 Invincibility 사용 가능 횟수
 
 // 비행기 위치 범위 체크 함수
 static int airplaneInRange(int x, int y) {
@@ -42,10 +41,15 @@ void reset_game() {
     airplane_y = 50;
 
     // 대쉬 상태 초기화
-    is_dashing = 0;
-    dash_frames_left = 0;
+    dashing = 0;
+    dash_left = 0;
     prev_buttons.a = 0;
     prev_buttons.b = 0;
+
+    // Invincibility 상태 초기화
+    invincible = 0;
+    inv_left = 0;
+    inv_cnt = MAX_INVINCIBILITY_COUNT;
 }
 
 void map_slide() {
@@ -97,73 +101,152 @@ static void update_airplane(int speed) {
     moveObj(&airplane_x, &airplane_y, speed, airplaneInRange);
 }
 
-// 비행기 그리기
-void draw_airplane() {
-    set_obj(airplane_x, airplane_y, &airplane_bitmap);
-}
-
-// 게임 플레이 (모든 게임 로직 포함)
-void play_game() {
-    // 버튼 상태 공통 획득
-    ButtonState buttons = st7789_readButtons();
-
-    // 게임 오버 상태 처리
-    if (game_over) {
-        // 게임 오버 화면 표시 (매 프레임 갱신)
-        show_game_over();
-        
-
-        if (buttons.a && buttons.b) {
-            reset_game();
-        }
-        prev_buttons = buttons;
+// Invincibility 남은 카운트 우상단에 표시
+static void draw_invincibility_count() {
+    // 사용 가능 횟수가 0이면 아무것도 표시하지 않음
+    if (inv_cnt <= 0) {
         return;
     }
 
-    if (!is_dashing && buttons.a && !prev_buttons.a) {
-        is_dashing = 1;
-        dash_frames_left = DASH_FRAMES;
+    const int margin = 2;
+    int icon_w = airplane_bitmap.width;
+    int x = screen_bitmap.width - margin;
+    int y = margin;
+
+    // 남은 횟수만큼 비행기 아이콘을 우상단에 오른쪽 정렬로 그린다
+    for (int i = 0; i < inv_cnt; i++) {
+        x -= icon_w;
+        set_obj(x, y, &airplane_bitmap);
+        x -= margin;
     }
-    
-    // 화면 초기화
-    reset_screen();
-    
-    // 배경 스크롤
-    map_slide();
-    
-    // 파이프 스크롤
-    pipes_slide();
-    
-    // 조이스틱으로 비행기 이동 (대쉬 중이면 빠르게)
-    if (is_dashing) {
+}
+
+// 비행기 그리기
+void draw_airplane() {
+    if (invincible) {
+        if ((inv_left % 6) < 3) {
+            return;
+        }
+    }
+    set_obj(airplane_x, airplane_y, &airplane_bitmap);
+}
+
+// -------- 내부 게임 로직 헬퍼 함수들 --------
+
+// 게임 오버 상태 처리
+static int handle_game_over(ButtonState buttons) {
+    if (!game_over) {
+        return 0;
+    }
+
+    // 게임 오버 화면 표시 (매 프레임 갱신)
+    show_game_over();
+
+    // A + B 동시 입력 시 게임 리셋
+    if (buttons.a && buttons.b) {
+        reset_game();
+    }
+
+    // 버튼 상태 저장
+    prev_buttons = buttons;
+    return 1;
+}
+
+
+static void update_invincibility(ButtonState buttons) {
+    // B 키를 눌렀을 때 Invincibility 시작 (에지 감지, 남은 카운트가 있을 때만)
+    if (!invincible && inv_cnt > 0 && buttons.b && !prev_buttons.b) {
+        invincible = 1;
+        inv_left = INVINCIBILITY_FRAMES;
+        inv_cnt--;
+    }
+
+    // Invincibility 시간 감소
+    if (invincible) {
+        inv_left--;
+        if (inv_left <= 0) {
+            invincible = 0;
+        }
+    }
+}
+
+// 대쉬 상태 갱신
+static void update_dash(ButtonState buttons) {
+
+    if (!dashing && buttons.a && !prev_buttons.a) {
+        dashing = 1;
+        dash_left = DASH_FRAMES;
+    }
+
+    if (dashing) {
         update_airplane(DASH_SPEED);
-        dash_frames_left--;
-        if (dash_frames_left <= 0) {
-            is_dashing = 0;
+        dash_left--;
+        if (dash_left <= 0) {
+            dashing = 0;
         }
     } else {
         update_airplane(airplaneSpeed);
     }
-    
-    // 대쉬 중에는 충돌 판정 건너뛰기 (무적 대쉬)
-    if (!is_dashing) {
+}
+
+static void update_map() {
+    // 화면 초기화
+    reset_screen();
+
+    // 배경 스크롤
+    map_slide();
+
+    // 파이프 스크롤
+    pipes_slide();
+}
+
+// 충돌 처리
+static int handle_collision(ButtonState buttons) {
+    // 대쉬 중이거나 Invincibility 상태일 때는 충돌 판정 건너뛰기
+    if (!dashing && !invincible) {
         if (update_hitbox_and_check_collision(PipesSlideIdx, airplane_x, airplane_y)) {
             game_over = 1;
             show_game_over();
             prev_buttons = buttons;
-            return;
+            return 1;
         }
     }
-    
-    // 비행기 그리기
-    draw_airplane();
-    
-    // 화면에 출력
-    draw_screen();
-    
-    // 가속 업데이트
-    update_acceleration();
+    return 0;
+}
 
-    // 버튼 상태 저장 (다음 프레임에서 에지 검출용)
+
+
+
+// 게임 플레이 
+void play_game() {
+  
+    ButtonState buttons = st7789_readButtons();
+
+    if (handle_game_over(buttons)) {
+        return;
+    }
+
+    update_invincibility(buttons);
+
+    update_map();
+
+    // 이동/대쉬 처리
+    update_dash(buttons);
+
+    if (handle_collision(buttons)) {
+        return;
+    }
+
+
+
+   draw_airplane();
+
+   draw_invincibility_count();
+
+   draw_screen();
+
+
+   update_acceleration();
+
     prev_buttons = buttons;
 }
