@@ -162,7 +162,7 @@ void set_map_pipes(const bitmap* obj, int idx) {
 }
 
 static inline int inRange(int x,int y,const bitmap* obj){
-  return 0<=x && x+obj->width<screen_bitmap.width &&0<=y && y+obj->height<screen_bitmap.height;
+  return 0<=x && x+obj->width<=screen_bitmap.width &&0<=y && y+obj->height<=screen_bitmap.height;
 }
 
 

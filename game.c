@@ -19,16 +19,6 @@ static int airplane_y = 50;
 
 // 비행기 위치 범위 체크 함수
 static int airplaneInRange(int x, int y) {
-    // 화면 범위 내에 있는지 확인
-    if (screen_bitmap.bitmap == NULL || airplane_bitmap.bitmap == NULL) {
-        return 0;
-    }
-    if (screen_bitmap.width == 0 || screen_bitmap.height == 0) {
-        return 0;
-    }
-    if (airplane_bitmap.width == 0 || airplane_bitmap.height == 0) {
-        return 0;
-    }
     return (y >= 0 && y + airplane_bitmap.height < screen_bitmap.height &&
             x >= 0 && x + airplane_bitmap.width < screen_bitmap.width);
 }
