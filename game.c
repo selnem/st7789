@@ -6,12 +6,14 @@
 #include "physics.h"
 #include "st7789.h"
 #define MAXSPEED 40
+#define FIXRATE 60
 
 static int MapSlideIdx=0;
 static int PipesSlideIdx=-180;
 static int slideSpeed=5;
 const int acceleration=2;
 static int game_over = 0;  // 게임 오버 상태
+const int airplaneSpeed=5;
 
 // 비행기 위치
 static int airplane_x = 50;
@@ -64,7 +66,7 @@ void pipes_slide() {
 void update_acceleration() {
     static int cnt=0;
     cnt++;
-    if (!(cnt%=20)&&slideSpeed<=MAXSPEED) {
+    if (!(cnt%=FIXRATE)&&slideSpeed<=MAXSPEED) {
         slideSpeed+=acceleration;
     }
 }
@@ -72,19 +74,15 @@ void update_acceleration() {
 
 // 게임 오버 화면 표시
 void show_game_over() {
-    reset_screen();
     set_obj(0, 0, &gameOver_bitmap);
     draw_screen();
 }
 
-// 게임 오버 상태 확인
-int is_game_over() {
-    return game_over;
-}
+
 
 // 비행기 업데이트 (조이스틱 입력 처리)
 void update_airplane() {
-    moveObj(&airplane_x, &airplane_y, 4, airplaneInRange);
+    moveObj(&airplane_x, &airplane_y, airplaneSpeed, airplaneInRange);
 }
 
 // 비행기 그리기
