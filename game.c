@@ -11,7 +11,6 @@
 static int MapSlideIdx=0;
 static int PipesSlideIdx=-180;
 static int slideSpeed=5;
-const int acceleration=2;
 static int game_over = 0;  // 게임 오버 상태
 const int airplaneSpeed=5;
 
@@ -28,10 +27,8 @@ static int airplaneInRange(int x, int y) {
 void reset_game() {
     MapSlideIdx=0;
     PipesSlideIdx=-180;
-
     slideSpeed=5;
     game_over = 0;
-
     airplane_x = 50;
     airplane_y = 50;
 }
@@ -67,7 +64,7 @@ void update_acceleration() {
     static int cnt=0;
     cnt++;
     if (!(cnt%=FIXRATE)&&slideSpeed<=MAXSPEED) {
-        slideSpeed+=acceleration;
+        slideSpeed++;
     }
 }
 
