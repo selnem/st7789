@@ -76,6 +76,12 @@ int check_collision() {
 
 // 히트박스 업데이트 및 충돌 체크 (파이프와 비행기 히트박스 업데이트 및 충돌 체크)
 int update_hitbox_and_check_collision(int pipes_slide_idx, int airplane_x, int airplane_y) {
+    if (pipes_bitmap.bitmap == NULL || airplane_bitmap.bitmap == NULL) {
+        return 0;
+    }
+    if (hitbox_bitmap.bitmap == NULL) {
+        return 0;
+    }
     // 히트박스 화면 초기화
     reset_hitbox_screen();
     

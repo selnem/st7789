@@ -19,19 +19,37 @@ static inline uint8_t pixelLo(uint16_t dot){
 
 
 void reset_screen(){
+    if (screen_bitmap.bitmap == NULL) {
+        return;
+    }
+    if (screen_bitmap.width == 0 || screen_bitmap.height == 0) {
+        return;
+    }
     for(int i=0;i<screen_bitmap.height;i++){
         for(int j=0;j<screen_bitmap.width;j++){
-            screen_bitmap.bitmap[i*screen_bitmap.width+j]=reset_color;
+            int idx = i*screen_bitmap.width+j;
+            if (idx >= 0 && idx < screen_bitmap.width * screen_bitmap.height) {
+                screen_bitmap.bitmap[idx]=reset_color;
+            }
         }
     }
 }
 
 void draw_screen() {
+  if (screen_bitmap.bitmap == NULL) {
+    return;
+  }
+  if (screen_bitmap.width == 0 || screen_bitmap.height == 0) {
+    return;
+  }
   st7789_writeCmds();
   for(int i=0;i<screen_bitmap.height && i<ST7789_TFTHEIGHT;i++){
     for(int j=0;j<screen_bitmap.width && j<ST7789_TFTWIDTH;j++){
-      bcm2835_spi_transfer(pixelHi(screen_bitmap.bitmap[i*screen_bitmap.width+j]));
-      bcm2835_spi_transfer(pixelLo(screen_bitmap.bitmap[i*screen_bitmap.width+j]));
+      int idx = i*screen_bitmap.width+j;
+      if (idx >= 0 && idx < screen_bitmap.width * screen_bitmap.height) {
+        bcm2835_spi_transfer(pixelHi(screen_bitmap.bitmap[idx]));
+        bcm2835_spi_transfer(pixelLo(screen_bitmap.bitmap[idx]));
+      }
     }
   }
 }

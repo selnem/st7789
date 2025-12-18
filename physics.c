@@ -1,6 +1,12 @@
 #include"st7789.h"
 
 int moveObj(int *x, int *y,int delta,int(*inRange)(int,int)) {
+  if (x == NULL || y == NULL) {
+    return 0;
+  }
+  if (inRange == NULL) {
+    return 0;
+  }
   int isMove=0;
     JoystickState s = st7789_readJoystick();
     if (s.up) {
