@@ -28,10 +28,10 @@ void reset_screen(){
 
 void draw_screen() {
   st7789_writeCmds();
-  for(int i=0;i<ST7789_TFTHEIGHT;i++){
-    for(int j=0;j<ST7789_TFTWIDTH;j++){
-      bcm2835_spi_transfer(pixelHi(screen_bitmap.bitmap[i*ST7789_TFTWIDTH+j]));
-      bcm2835_spi_transfer(pixelLo(screen_bitmap.bitmap[i*ST7789_TFTWIDTH+j]));
+  for(int i=0;i<screen_bitmap.height && i<ST7789_TFTHEIGHT;i++){
+    for(int j=0;j<screen_bitmap.width && j<ST7789_TFTWIDTH;j++){
+      bcm2835_spi_transfer(pixelHi(screen_bitmap.bitmap[i*screen_bitmap.width+j]));
+      bcm2835_spi_transfer(pixelLo(screen_bitmap.bitmap[i*screen_bitmap.width+j]));
     }
   }
 }

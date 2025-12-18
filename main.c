@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <bcm2835.h>
+#include <unistd.h>
 #include "st7789.h"
 #include "game.h"
 
@@ -23,6 +24,8 @@ int main(int argc, char **argv) {
     
     while (1) {
         play_game();
+        // 프레임 딜레이 (약 60 FPS)
+        usleep(16666);  // 16.666ms = 1/60초
     }
     
     bcm2835_spi_end();
