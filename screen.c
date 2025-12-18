@@ -19,7 +19,7 @@ static inline uint8_t pixelLo(uint16_t dot){
 }
 
 
-void reset_screen(){
+void resetScreen(){
     if (screen_bitmap.bitmap == NULL) {
         return;
     }
@@ -36,7 +36,7 @@ void reset_screen(){
     }
 }
 
-void draw_screen() {
+void drawScreen() {
   if (screen_bitmap.bitmap == NULL) {
     return;
   }
@@ -62,7 +62,7 @@ static inline int oneDToTwoD(int i,int j, const bitmap *obj) {
   return obj->width*i+j;
 }
 
-void set_obj(int x, int y,const bitmap* obj){
+void setObj(int x, int y,const bitmap* obj){
   if(obj==NULL){
    return;
   }
@@ -91,7 +91,7 @@ void set_obj(int x, int y,const bitmap* obj){
 }
 
 
-void set_map(const bitmap* obj, int idx) {
+void setMap(const bitmap* obj, int idx) {
   if (obj==NULL) {
     return;
   }
@@ -129,7 +129,7 @@ void set_map(const bitmap* obj, int idx) {
   }
 }
 
-void set_map_pipes(const bitmap* obj, int idx) {
+void setMapPipes(const bitmap* obj, int idx) {
   if (obj==NULL) {
     return;
   }
