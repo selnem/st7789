@@ -47,14 +47,29 @@ int set_hitbox_airplane(int x, int y, const bitmap* obj) {
     if (obj == NULL) {
         return 0;
     }
+    if (obj->bitmap == NULL) {
+        return 0;
+    }
+    if (hitbox_bitmap.bitmap == NULL) {
+        return 0;
+    }
     // 비행기를 녹색으로 히트박스에 그리기 (그리면서 충돌 확인)
-    for (int i = 0; i < obj->height && (x + i) < hitbox_bitmap.height; i++) {
-        if (x + i >= 0) {
-            for (int j = 0; j < obj->width && (y + j) < hitbox_bitmap.width; j++) {
-                if (y + j >= 0) {
-                    uint16_t pixel = obj->bitmap[oneDToTwoD_hitbox(i, j, obj)];
+    // x는 열(column), y는 행(row) - set_obj와 동일한 좌표계
+    for (int i = 0; i < obj->height && (y + i) < hitbox_bitmap.height; i++) {
+        if (y + i >= 0) {
+            for (int j = 0; j < obj->width && (x + j) < hitbox_bitmap.width; j++) {
+                if (x + j >= 0) {
+                    int src_idx = oneDToTwoD_hitbox(i, j, obj);
+                    if (src_idx < 0 || src_idx >= obj->width * obj->height) {
+                        continue;
+                    }
+                    uint16_t pixel = obj->bitmap[src_idx];
                     if (pixel != 0x0000) {
-                        int pos = oneDToTwoD_hitbox(x + i, y + j, &hitbox_bitmap);
+                        // 좌표계: (행, 열) = (y+i, x+j)
+                        int pos = oneDToTwoD_hitbox(y + i, x + j, &hitbox_bitmap);
+                        if (pos < 0 || pos >= hitbox_bitmap.width * hitbox_bitmap.height) {
+                            continue;
+                        }
                         // 비행기를 그리기 전에 파이프(빨강)가 있는지 확인
                         if (hitbox_bitmap.bitmap[pos] == HITBOX_COLOR_PIPE) {
                             return 1;  // 충돌 발생 - 바로 리턴
