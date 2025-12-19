@@ -79,10 +79,7 @@ void updateInv(ButtonState now, ButtonState prev) {
     }
 }
 
-void airplaneMove(int *x, int *y, int baseSpeed,
-                  ButtonState now, ButtonState prev) {
-    if (x == NULL || y == NULL) return;
-    //a누를시 대쉬 시작
+void airplaneMove(int *x, int *y, int baseSpeed, ButtonState now, ButtonState prev) {
     if (!dashing && now.a && !prev.a) {
         dashing = 1;
         dash_left = DASH_FRAMES;
