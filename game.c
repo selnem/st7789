@@ -9,7 +9,7 @@ static int gameOver = 0;
 static int airplane_x = 50;
 static int airplane_y = 50;
 
-// 버튼 이전 상태 (에지 감지용)
+// 버튼 이전 상태
 static ButtonState prevButtons = {0, 0};
 
 void resetGame() {
